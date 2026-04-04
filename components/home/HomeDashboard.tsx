@@ -2,7 +2,8 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { mockGuest, mockResort } from '@/lib/mockData';
+import { useUser } from '@clerk/nextjs';
+import { mockResort } from '@/lib/mockData';
 import MoodButtons from './MoodButtons';
 import ScrollableEvents from './ScrollableEvents';
 import SuggestionsForYou from './SuggestionsForYou';
@@ -11,6 +12,8 @@ import HighlightsSection from './HighlightsSection';
 import QuickStats from './QuickStats';
 
 export default function HomeDashboard() {
+  const { user, isLoaded } = useUser();
+  const guestName = isLoaded ? (user?.firstName || user?.username || 'Guest') : 'Guest';
   const roomStatus = [
     { id: '1', task: 'Room Cleaned', completed: true, icon: '✓' },
     { id: '2', task: 'Coffee Ready', completed: true, icon: '☕' },
@@ -35,7 +38,7 @@ export default function HomeDashboard() {
         {/* Hero Text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 space-y-2">
           <h1 className="text-white font-serif text-4xl md:text-5xl lg:text-6xl font-bold drop-shadow-2xl">
-            Welcome home, {mockGuest.name} ❤️
+            Welcome home, {guestName} ❤️
           </h1>
           <p className="text-white/90 text-lg md:text-xl font-light drop-shadow-lg">
             You are family here at {mockResort.name}

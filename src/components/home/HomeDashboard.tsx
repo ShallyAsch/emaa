@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { mockGuest, mockProactiveOffers, mockRoomStatus } from '@/src/lib/mockData';
+import { useUser } from '@clerk/nextjs';
+import { mockProactiveOffers, mockRoomStatus } from '@/src/lib/mockData';
 import QuickStats from './QuickStats';
 import ProactiveCard from './ProactiveCard';
 import MoodButtons from './MoodButtons';
@@ -16,8 +17,9 @@ import EmamaChatWidget from './EmamaChatWidget';
 import BackToTopButton from './BackToTopButton';
 
 export default function HomeDashboard() {
+  const { user, isLoaded } = useUser();
+  const guestName = isLoaded ? (user?.firstName || user?.username || 'Guest') : 'Guest';
   const [activeOffer, setActiveOffer] = useState<string | null>(null);
-  const guest = mockGuest;
 
   return (
     <div className="min-h-screen bg-background">
@@ -33,7 +35,7 @@ export default function HomeDashboard() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-background" />
 
         <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 text-white">
-          <p className="text-sm md:text-base text-white/80 mb-2">Welcome home, {guest.name}</p>
+          <p className="text-sm md:text-base text-white/80 mb-2">Welcome home, {guestName}</p>
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold mb-2">
             You are family here at Kuriftu African Village
           </h1>
