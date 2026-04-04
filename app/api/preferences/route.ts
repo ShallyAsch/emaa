@@ -7,11 +7,11 @@ export async function GET() {
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const prefs = getPreferences(userId);
+    const prefs = await getPreferences(userId);
     return NextResponse.json(prefs || {});
   } catch (err) {
     console.error('GET /api/preferences error:', err);
-    return NextResponse.json({ error: 'DB error' }, { status: 500 });
+    return NextResponse.json({ error: 'DB error', details: String(err) }, { status: 500 });
   }
 }
 
@@ -21,9 +21,7 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    console.log('POST /api/preferences - userId:', userId);
-    console.log('POST /api/preferences - body:', JSON.stringify(body));
-    savePreferences(userId, body);
+    await savePreferences(userId, body);
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error('POST /api/preferences error:', err);

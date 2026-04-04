@@ -6,7 +6,6 @@ import { upsertUser } from '@/src/lib/db';
 export async function POST(req: Request) {
   const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
   if (!webhookSecret) {
-    // Webhook not configured — skip silently
     return new Response('Webhook not configured', { status: 400 });
   }
 
@@ -29,7 +28,7 @@ export async function POST(req: Request) {
     const { id, email_addresses, first_name, last_name, image_url, username } = evt.data;
     const primaryEmail = email_addresses?.[0]?.email_address || '';
 
-    upsertUser({
+    await upsertUser({
       clerk_id: id,
       username: username || '',
       email: primaryEmail,
