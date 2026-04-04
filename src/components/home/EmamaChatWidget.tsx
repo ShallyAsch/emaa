@@ -3,23 +3,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, MessageCircle } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
-import { analyzeMoodAndIntent } from '@/src/lib/aiAnalysis';
-
-interface UserPrefs {
-  favorite_foods?: string[];
-  activities?: string[];
-  hobbies?: string[];
-  personality_type?: string;
-  travel_context?: string;
-  time_preferences?: string[];
-  dietary_notes?: string;
-  coffee_preference?: string;
-  favorite_seating?: string;
-}
 
 export default function EmamaChatWidget() {
   const { user, isLoaded } = useUser();
-  const [prefs, setPrefs] = useState<UserPrefs>({});
   const displayName = isLoaded ? (user?.firstName || user?.username || 'User') : 'User';
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; text: string; id: number }>>([
@@ -32,16 +18,6 @@ export default function EmamaChatWidget() {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Load user preferences on mount
-  useEffect(() => {
-    if (isLoaded && user) {
-      fetch('/api/preferences')
-        .then(r => r.json())
-        .then(data => setPrefs(data))
-        .catch(() => {});
-    }
-  }, [isLoaded, user]);
 
   // Update greeting when auth state changes
   useEffect(() => {
@@ -73,31 +49,20 @@ export default function EmamaChatWidget() {
     setIsTyping(true);
 
     try {
-      // Connect to Gemini AI through our backend endpoint
-      const aiAnalysis = await analyzeMoodAndIntent(
-        textToSend,
-        {
-          coffeeType: 'medium',
-          roomTemperature: 72,
-          lightingPreference: 'ambient',
-          language: 'en',
-          dietaryRestrictions: prefs.dietary_notes ? [prefs.dietary_notes] : [],
-          favoriteSeating: prefs.favorite_seating || '',
-        },
-        {
-          setTemperature: () => {},
-          setLighting: () => {},
-          showToast: () => {}
-        }
-      );
+      const res = await fetch('/api/ai-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'hospitality',
+          message: textToSend,
+          userName: displayName,
+        }),
+      });
+      const data = await res.json();
 
       setMessages((prev) => [
         ...prev,
-        {
-          role: 'assistant',
-          text: aiAnalysis.message,
-          id: messageId + 1
-        },
+        { role: 'assistant', text: data.response || data.error || "I'm having trouble hearing you, my dear.", id: messageId + 1 },
       ]);
       
     } catch (error) {

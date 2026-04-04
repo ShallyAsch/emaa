@@ -1,14 +1,8 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { clerkMiddleware } from '@clerk/nextjs/server';
 
-const isPublicRoute = createRouteMatcher([
-  '/api/webhooks/clerk(.*)',
-  '/sign-in(.*)',
-  '/sign-up(.*)',
-]);
-
-export default clerkMiddleware(async (auth, req) => {
-  if (isPublicRoute(req)) return;
-  await auth.protect();
+export default clerkMiddleware((auth) => {
+  // Don't block any routes — let the app handle auth via useUser() hook
+  // Clerk modals handle login/signup, middleware doesn't protect routes
 });
 
 export const config = {

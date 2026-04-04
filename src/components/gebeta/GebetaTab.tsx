@@ -282,6 +282,22 @@ const SpiceIndicator = ({ level }: { level: number }) => (
 export default function GebetaTab() {
   const [favorites, setFavorites] = useState<string[]>(['emama-1', 'emama-2']);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [aiPick, setAiPick] = useState<{ reasoning: string; activity: { name: string }; meal: { name: string } } | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  const fetchAiPick = async () => {
+    setAiLoading(true);
+    try {
+      const res = await fetch('/api/ai-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'discovery', message: 'I want a great food and activity experience today' }),
+      });
+      const data = await res.json();
+      setAiPick(data);
+    } catch {}
+    setAiLoading(false);
+  };
 
   const toggleFavorite = (id: string) => {
     setFavorites((prev) =>
@@ -327,9 +343,49 @@ export default function GebetaTab() {
         </div>
       </div>
 
+      {/* AI Recommendation */}
+      <div className="px-4 md:px-8 -mt-6 relative z-10">
+        {!aiPick ? (
+          <button
+            onClick={fetchAiPick}
+            disabled={aiLoading}
+            className="w-full bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/30 rounded-2xl p-5 text-left hover:from-primary/30 transition-colors disabled:opacity-60"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground mb-1">
+                  {aiLoading ? 'Emama is curating...' : 'Ask Emama to recommend something'}
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  {aiLoading ? 'Finding the perfect match...' : 'Get a personalized food + activity suggestion'}
+                </p>
+              </div>
+            </div>
+          </button>
+        ) : (
+          <div className="bg-gradient-to-r from-accent/20 to-accent/10 border border-accent/30 rounded-2xl p-5">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-6 h-6 text-accent-foreground" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-foreground mb-1">Emama recommends ✨</h3>
+                <p className="text-muted-foreground text-sm italic mb-3">&ldquo;{aiPick.reasoning}&rdquo;</p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-secondary/20 text-secondary-foreground">🎯 {aiPick.activity?.name || 'Activity'}</span>
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-primary/20 text-primary">🍽 {aiPick.meal?.name || 'Dish'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* AI Welcome Message */}
-      <div className="px-4 md:px-8 -mt-6 relative z-10">
+      <div className="px-4 md:px-8 mt-6 relative z-10">
         <div className="bg-gradient-to-r from-accent/20 to-accent/10 border border-accent/30 rounded-2xl p-5">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center flex-shrink-0">

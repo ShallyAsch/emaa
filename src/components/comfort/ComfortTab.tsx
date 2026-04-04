@@ -38,8 +38,17 @@ const lightingOptions: LightingOption[] = [
 
 export default function ComfortTab() {
   const { toast } = useToast();
-  const [temperature, setTemperature] = useState(mockGuest.preferences.roomTemperature);
+  const [temperature, setTemperature] = useState(72);
   const [lighting, setLighting] = useState<LightingMode>('ambient');
+  const [weather, setWeather] = useState<{ temp: number; condition: string; next_event: { label: string } } | null>(null);
+
+  // Fetch weather on mount
+  useEffect(() => {
+    fetch('/api/weather')
+      .then(r => r.json())
+      .then(data => setWeather(data))
+      .catch(() => {});
+  }, []);
   
   // States to represent the lifecycle of a voice command
   const [isListening, setIsListening] = useState(false);
@@ -142,6 +151,27 @@ export default function ComfortTab() {
           Personalize your room environment with Emama AI
         </p>
       </div>
+
+      {/* Weather Card */}
+      {weather && (
+        <div className="px-4 md:px-8 pt-6">
+          <div className="bg-gradient-to-r from-blue-50 to-sky-50 border border-blue-100 rounded-2xl p-5 flex items-center gap-4">
+            <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
+              <span className="text-2xl">
+                {weather.condition.toLowerCase().includes('rain') ? '🌧' : weather.condition.toLowerCase().includes('cloud') ? '☁' : weather.condition.toLowerCase().includes('clear') ? '☀' : '🌤'}
+              </span>
+            </div>
+            <div className="flex-1">
+              <p className="text-2xl font-bold text-foreground">{weather.temp}°C</p>
+              <p className="text-sm text-muted-foreground">{weather.condition}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-muted-foreground uppercase">Next</p>
+              <p className="text-sm font-medium text-foreground capitalize">{weather.next_event?.label || '—'}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="px-4 md:px-8 py-8 max-w-3xl mx-auto space-y-8">
         
