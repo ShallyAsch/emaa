@@ -344,7 +344,7 @@ export default function GebetaTab() {
       </div>
 
       {/* AI Recommendation */}
-      <div className="px-4 md:px-8 py-6 relative z-10">
+      <div className="px-4 md:px-8 mt-8 relative z-10">
         <div className="max-w-3xl mx-auto">
         {!aiPick ? (
           <button
