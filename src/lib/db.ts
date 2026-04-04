@@ -1,6 +1,7 @@
 import { createClient, Client } from '@libsql/client';
 
 let db: Client | null = null;
+let dbInitialized = false;
 
 function getDb(): Client {
   if (!db) {
@@ -13,9 +14,13 @@ function getDb(): Client {
 }
 
 export async function initDb() {
+  if (dbInitialized) return;
   const database = getDb();
+  // Recreate tables to remove FK constraint
   await database.batch([
-    `CREATE TABLE IF NOT EXISTS users (
+    `DROP TABLE IF EXISTS user_preferences`,
+    `DROP TABLE IF EXISTS users`,
+    `CREATE TABLE users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       clerk_id TEXT UNIQUE NOT NULL,
       username TEXT,
@@ -26,7 +31,7 @@ export async function initDb() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
-    `CREATE TABLE IF NOT EXISTS user_preferences (
+    `CREATE TABLE user_preferences (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       clerk_id TEXT UNIQUE NOT NULL,
       favorite_foods TEXT DEFAULT '[]',
@@ -40,12 +45,12 @@ export async function initDb() {
       coffee_preference TEXT,
       special_moments TEXT DEFAULT '[]',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (clerk_id) REFERENCES users(clerk_id) ON DELETE CASCADE
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
     `CREATE INDEX IF NOT EXISTS idx_users_clerk_id ON users(clerk_id)`,
     `CREATE INDEX IF NOT EXISTS idx_prefs_clerk_id ON user_preferences(clerk_id)`,
   ]);
+  dbInitialized = true;
 }
 
 export async function upsertUser(data: {
