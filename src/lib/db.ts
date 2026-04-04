@@ -16,11 +16,8 @@ function getDb(): Client {
 export async function initDb() {
   if (dbInitialized) return;
   const database = getDb();
-  // Recreate tables to remove FK constraint
   await database.batch([
-    `DROP TABLE IF EXISTS user_preferences`,
-    `DROP TABLE IF EXISTS users`,
-    `CREATE TABLE users (
+    `CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       clerk_id TEXT UNIQUE NOT NULL,
       username TEXT,
@@ -31,7 +28,7 @@ export async function initDb() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
-    `CREATE TABLE user_preferences (
+    `CREATE TABLE IF NOT EXISTS user_preferences (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       clerk_id TEXT UNIQUE NOT NULL,
       favorite_foods TEXT DEFAULT '[]',
