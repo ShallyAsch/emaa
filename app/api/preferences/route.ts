@@ -1,12 +1,22 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import { savePreferences, getPreferences } from '@/src/lib/db';
+import { savePreferences, getPreferences, initDb } from '@/src/lib/db';
+
+// Ensure tables exist
+let dbReady: Promise<void> | null = null;
+function ensureDb() {
+  if (!dbReady) {
+    dbReady = initDb();
+  }
+  return dbReady;
+}
 
 export async function GET() {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
+    await ensureDb();
     const prefs = await getPreferences(userId);
     return NextResponse.json(prefs || {});
   } catch (err) {
@@ -20,6 +30,7 @@ export async function POST(req: Request) {
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
+    await ensureDb();
     const body = await req.json();
     await savePreferences(userId, body);
     return NextResponse.json({ success: true });
