@@ -2,10 +2,25 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, MessageCircle } from 'lucide-react';
+import { useUser } from '@clerk/nextjs';
 import { analyzeMoodAndIntent } from '@/src/lib/aiAnalysis';
-import { mockGuest } from '@/src/lib/mockData';
+
+interface UserPrefs {
+  favorite_foods?: string[];
+  activities?: string[];
+  hobbies?: string[];
+  personality_type?: string;
+  travel_context?: string;
+  time_preferences?: string[];
+  dietary_notes?: string;
+  coffee_preference?: string;
+  favorite_seating?: string;
+}
 
 export default function EmamaChatWidget() {
+  const { user, isLoaded } = useUser();
+  const [prefs, setPrefs] = useState<UserPrefs>({});
+  const displayName = isLoaded ? (user?.firstName || user?.username || 'User') : 'User';
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; text: string; id: number }>>([
     {
@@ -17,6 +32,29 @@ export default function EmamaChatWidget() {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Load user preferences on mount
+  useEffect(() => {
+    if (isLoaded && user) {
+      fetch('/api/preferences')
+        .then(r => r.json())
+        .then(data => setPrefs(data))
+        .catch(() => {});
+    }
+  }, [isLoaded, user]);
+
+  // Update greeting when auth state changes
+  useEffect(() => {
+    if (isLoaded) {
+      setMessages([{
+        role: 'assistant',
+        text: user
+          ? `Selam, ${user.firstName || user.username || 'my dear'}! I am Emama Zinashe. I know everything about your stay here. How can I help you today?`
+          : 'Selam! I am Emama Zinashe. I know everything about your stay here. How can I help you today, my dear?',
+        id: Date.now()
+      }]);
+    }
+  }, [isLoaded, user]);
 
   // Auto-scroll to latest message
   useEffect(() => {
@@ -38,7 +76,14 @@ export default function EmamaChatWidget() {
       // Connect to Gemini AI through our backend endpoint
       const aiAnalysis = await analyzeMoodAndIntent(
         textToSend,
-        mockGuest.preferences,
+        {
+          coffeeType: 'medium',
+          roomTemperature: 72,
+          lightingPreference: 'ambient',
+          language: 'en',
+          dietaryRestrictions: prefs.dietary_notes ? [prefs.dietary_notes] : [],
+          favoriteSeating: prefs.favorite_seating || '',
+        },
         {
           setTemperature: () => {},
           setLighting: () => {},

@@ -3,8 +3,33 @@
 import React, { useState, useEffect } from 'react';
 import { mockGuest } from '@/lib/mockData';
 import { Mic, AlertCircle, Sparkles, X } from 'lucide-react';
-import { analyzeMoodAndIntent, GrokAnalysis } from '@/lib/grok';
 import { useToast } from '@/components/ui/use-toast';
+
+interface GrokSuggestion {
+  icon: string;
+  label: string;
+  action: () => void;
+}
+
+interface GrokAnalysis {
+  message: string;
+  suggestions: GrokSuggestion[];
+  transcript?: string;
+  mood?: string;
+}
+
+async function analyzeMoodAndIntent(
+  _transcript: string,
+  _preferences: unknown,
+  actions: { setTemperature: (t: number) => void; setLighting: (l: LightingMode) => void; showToast: (title: string, desc: string) => void }
+): Promise<GrokAnalysis> {
+  return {
+    message: 'Voice analysis is not available in development mode.',
+    suggestions: [
+      { icon: '🌡️', label: 'Reset Comfort', action: () => { actions.setTemperature(72); actions.setLighting('soft'); } }
+    ]
+  };
+}
 
 type LightingMode = 'soft' | 'cozy' | 'bright' | 'natural';
 
@@ -74,7 +99,7 @@ export default function ComfortTab() {
             {
               setTemperature,
               setLighting,
-              showToast: (title, description) => toast({ title, description })
+              showToast: (title: string, description: string) => toast({ title, description })
             }
           );
           
@@ -195,7 +220,7 @@ export default function ComfortTab() {
               <div className="space-y-3 pt-2 border-t border-accent/10">
                 <div className="flex items-center gap-2">
                   <span className="text-xs px-2 py-0.5 rounded-full bg-secondary/20 text-secondary-foreground font-medium">
-                    Mood: {analysis.mood.toUpperCase()}
+                    Mood: {(analysis.mood || 'unknown').toUpperCase()}
                   </span>
                 </div>
                 <p className="text-sm text-foreground leading-relaxed">
@@ -204,7 +229,7 @@ export default function ComfortTab() {
                 
                 {analysis.suggestions.length > 0 && (
                   <div className="flex flex-wrap gap-2 pt-1">
-                    {analysis.suggestions.map((suggestion, idx) => (
+                    {analysis.suggestions.map((suggestion: { icon: string; label: string; action: () => void }, idx: number) => (
                       <button
                         key={idx}
                         onClick={suggestion.action}

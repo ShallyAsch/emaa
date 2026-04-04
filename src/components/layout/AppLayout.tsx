@@ -1,8 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import {
+  UserButton,
+  SignInButton,
+  SignUpButton,
+} from '@clerk/nextjs';
 import {
   Home,
   Calendar,
@@ -14,11 +19,15 @@ import {
   Map,
   UtensilsCrossed,
   User,
+  LogIn,
+  UserPlus,
 } from 'lucide-react';
-import { mockGuest, mockResort } from '@/src/lib/mockData';
+import { mockResort } from '@/src/lib/mockData';
 import EmamaChatWidget from '@/src/components/home/EmamaChatWidget';
 import BackToTopButton from '@/src/components/home/BackToTopButton';
 import LanguageSwitcher from '@/src/components/layout/LanguageSwitcher';
+import PreferencesModal from '@/src/components/auth/PreferencesModal';
+import { useUser } from '@clerk/nextjs';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -28,6 +37,24 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showPrefsModal, setShowPrefsModal] = useState(false);
+  const { user, isLoaded } = useUser();
+  const checkedPrefs = useRef(false);
+
+  // Check if user has preferences after auth loads (once only)
+  useEffect(() => {
+    if (isLoaded && user && !checkedPrefs.current) {
+      checkedPrefs.current = true;
+      fetch('/api/preferences')
+        .then(r => r.json())
+        .then(data => {
+          if (!data.favorite_foods || data.favorite_foods.length === 0) {
+            setShowPrefsModal(true);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [isLoaded, user]);
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -83,17 +110,38 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </div>
 
           {/* Right: Guest Info + Mobile Menu Toggle */}
-          <div className="flex items-center gap-4">
-            {/* Guest Profile */}
-            <Link
-              href="/profile"
-              className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full hover:bg-accent/10 transition-smooth text-sm font-medium"
-              aria-label="Guest profile"
-            >
-              <span>{mockGuest.avatar || '👤'}</span>
-              <span className="hidden md:inline text-primary">{mockGuest.name}</span>
-              <span className="text-accent">❤️</span>
-            </Link>
+          <div className="flex items-center gap-3">
+            {/* Auth Section */}
+            <div className="flex items-center gap-2">
+              {/* Authenticated: Show UserButton */}
+              <UserButton
+                afterSignOutUrl="/"
+                appearance={{
+                  elements: {
+                    avatarBox: 'w-9 h-9',
+                  },
+                }}
+              />
+
+              {/* Unauthenticated: Show Login/Signup icons */}
+              <SignInButton mode="modal">
+                <button
+                  className="flex items-center justify-center w-9 h-9 rounded-full border border-border bg-white hover:bg-accent/10 transition-smooth shadow-sm"
+                  aria-label="Sign in"
+                >
+                  <LogIn className="w-4 h-4 text-primary" />
+                </button>
+              </SignInButton>
+
+              <SignUpButton mode="modal">
+                <button
+                  className="flex items-center justify-center w-9 h-9 rounded-full border border-border bg-white hover:bg-accent/10 transition-smooth shadow-sm"
+                  aria-label="Sign up"
+                >
+                  <UserPlus className="w-4 h-4 text-primary" />
+                </button>
+              </SignUpButton>
+            </div>
 
             {/* Language Switcher */}
             <LanguageSwitcher />
@@ -199,6 +247,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       {/* Back to Top Button */}
       <BackToTopButton />
+
+      {/* Preferences Modal (shown after login/signup if no prefs) */}
+      {showPrefsModal && (
+        <PreferencesModal onClose={() => setShowPrefsModal(false)} />
+      )}
     </div>
   );
 }

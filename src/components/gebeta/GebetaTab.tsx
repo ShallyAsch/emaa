@@ -27,7 +27,7 @@ const emamasPicks: FoodItem[] = [
     amharicName: 'ጥብስ',
     description: 'Sauteed cubes of tender beef with fresh tomatoes, jalapenos, onions, and rosemary. Served sizzling hot.',
     emotionalDescription: 'The sizzle and aroma that fills the room, bringing joy and warmth to every gathering.',
-    image: '/dining-hall.jpg',
+    image: '/tibs.jpg',
     tags: ['Sizzling', 'Fresh', 'Hearty'],
     spiceLevel: 3,
     aiReason: 'A family favorite that brings everyone together',
@@ -40,7 +40,7 @@ const emamasPicks: FoodItem[] = [
     amharicName: 'ዶሮ ወጥ',
     description: 'A rich, spicy chicken stew slow-cooked in berbere spices with hard-boiled eggs, served with traditional injera.',
     emotionalDescription: 'The queen of Ethiopian dishes, a recipe passed down through generations of loving mothers.',
-    image: '/buna-ceremony.jpg',
+    image: '/dorowot.jpg',
     tags: ['Traditional', 'Spicy', 'Comfort'],
     spiceLevel: 4,
     aiReason: 'Your love for bold, spicy flavors makes this perfect',
@@ -53,7 +53,7 @@ const emamasPicks: FoodItem[] = [
     amharicName: 'ክትፎ',
     description: 'Premium minced beef seasoned with mitmita and niter kibbeh, served warm with ayib cheese and gomen.',
     emotionalDescription: 'A delicacy for the adventurous soul, honoring centuries of Ethiopian culinary tradition.',
-    image: '/kuriftu-resort.jpg',
+    image: '/kitfo.jpg',
     tags: ['Authentic', 'Premium', 'Bold'],
     spiceLevel: 3,
     aiReason: 'Based on your preference for premium, authentic dishes',
@@ -62,28 +62,17 @@ const emamasPicks: FoodItem[] = [
   },
 ];
 
+
 // All Ethiopian foods
 const allFoods: FoodItem[] = [
   // Meat Dishes
-  {
-    id: '1',
-    name: 'Siga Wat',
-    amharicName: 'ስጋ ወጥ',
-    description: 'Spicy beef stew cooked in berbere sauce with onions and niter kibbeh.',
-    emotionalDescription: 'A hearty dish that warms the soul on any day.',
-    image: '/dining-hall.jpg',
-    tags: ['Spicy', 'Beef', 'Traditional'],
-    spiceLevel: 4,
-    rating: 4.7,
-    category: 'meat',
-  },
   {
     id: '2',
     name: 'Zilzil Tibs',
     amharicName: 'ዝልዝል ጥብስ',
     description: 'Strips of beef sauteed with onions and peppers, tender and flavorful.',
     emotionalDescription: 'Quick, delicious, and perfect for any occasion.',
-    image: '/ethiopian-landscape.jpg',
+    image: '/zilziltibs.jpg',
     tags: ['Beef', 'Sauteed', 'Mild'],
     spiceLevel: 2,
     rating: 4.6,
@@ -95,7 +84,7 @@ const allFoods: FoodItem[] = [
     amharicName: 'አዋዜ ጥብስ',
     description: 'Extra spicy beef tibs marinated in awaze sauce, for heat lovers.',
     emotionalDescription: 'A fiery celebration of Ethiopian spice traditions.',
-    image: '/pool-garden.jpg',
+    image: '/awazetibs.jpg',
     tags: ['Extra Spicy', 'Bold', 'Traditional'],
     spiceLevel: 5,
     rating: 4.8,
@@ -107,34 +96,10 @@ const allFoods: FoodItem[] = [
     amharicName: 'ጎረድ ጎረድ',
     description: 'Cubed raw beef seasoned with awaze and mitmita, an Ethiopian delicacy.',
     emotionalDescription: 'For the truly adventurous, a taste of authentic tradition.',
-    image: '/dining-hall.jpg',
+    image: '/goredgored.jpg',
     tags: ['Raw', 'Bold', 'Traditional'],
     spiceLevel: 4,
     rating: 4.5,
-    category: 'meat',
-  },
-  {
-    id: '5',
-    name: 'Yebeg Tibs',
-    amharicName: 'የበግ ጥብስ',
-    description: 'Sauteed lamb with rosemary, garlic, and traditional spices.',
-    emotionalDescription: 'Tender lamb that melts in your mouth.',
-    image: '/kuriftu-resort.jpg',
-    tags: ['Lamb', 'Aromatic', 'Special'],
-    spiceLevel: 2,
-    rating: 4.7,
-    category: 'meat',
-  },
-  {
-    id: '6',
-    name: 'Yebeg Wat',
-    amharicName: 'የበግ ወጥ',
-    description: 'Lamb stew in rich berbere sauce, slow-cooked to perfection.',
-    emotionalDescription: 'A festive dish reserved for special celebrations.',
-    image: '/buna-ceremony.jpg',
-    tags: ['Lamb', 'Spicy', 'Festive'],
-    spiceLevel: 4,
-    rating: 4.8,
     category: 'meat',
   },
   {
@@ -143,7 +108,7 @@ const allFoods: FoodItem[] = [
     amharicName: 'ዱለት',
     description: 'Minced tripe, liver, and lean beef fried with berbere, jalapenos, and niter kibbeh.',
     emotionalDescription: 'A bold dish for those who appreciate every part of the animal.',
-    image: '/dining-hall.jpg',
+    image: '/dulet.jpg',
     tags: ['Organ Meat', 'Bold', 'Traditional'],
     spiceLevel: 4,
     rating: 4.4,
@@ -155,7 +120,7 @@ const allFoods: FoodItem[] = [
     amharicName: 'ቀይ ወጥ',
     description: 'Classic red beef stew with intense berbere flavor and tender meat.',
     emotionalDescription: 'The foundation of Ethiopian cuisine, perfected over centuries.',
-    image: '/pool-garden.jpg',
+    image: '/sigawot.jpg',
     tags: ['Spicy', 'Classic', 'Comfort'],
     spiceLevel: 4,
     rating: 4.7,
@@ -168,7 +133,7 @@ const allFoods: FoodItem[] = [
     amharicName: 'ሽሮ',
     description: 'Creamy chickpea stew infused with aromatic spices and niter kibbeh.',
     emotionalDescription: 'Gentle on the palate, rich in tradition. A hug in a bowl.',
-    image: '/kuriftu-resort.jpg',
+    image: '/shiro.jpg',
     tags: ['Vegetarian', 'Comfort', 'Mild'],
     spiceLevel: 2,
     rating: 4.7,
@@ -180,7 +145,7 @@ const allFoods: FoodItem[] = [
     amharicName: 'ምስር ወጥ',
     description: 'Spiced red lentil stew cooked with berbere, onions, and garlic.',
     emotionalDescription: 'Simple ingredients transformed into something extraordinary.',
-    image: '/dining-hall.jpg',
+    image: '/misirwot.jpg',
     tags: ['Vegetarian', 'Spicy', 'Protein'],
     spiceLevel: 3,
     rating: 4.6,
@@ -192,20 +157,8 @@ const allFoods: FoodItem[] = [
     amharicName: 'ጎመን',
     description: 'Sauteed collard greens with garlic, ginger, and mild spices.',
     emotionalDescription: 'Fresh, healthy, and full of Ethiopian flavor.',
-    image: '/ethiopian-landscape.jpg',
+    image: '/gomen.jpg',
     tags: ['Vegetarian', 'Healthy', 'Mild'],
-    spiceLevel: 1,
-    rating: 4.5,
-    category: 'vegetarian',
-  },
-  {
-    id: '12',
-    name: 'Atakilt Wat',
-    amharicName: 'አታክልት ወጥ',
-    description: 'Cabbage, carrots, and potatoes gently cooked with turmeric and spices.',
-    emotionalDescription: 'Comfort food that nourishes body and soul.',
-    image: '/pool-garden.jpg',
-    tags: ['Vegetarian', 'Mild', 'Comfort'],
     spiceLevel: 1,
     rating: 4.5,
     category: 'vegetarian',
@@ -216,7 +169,7 @@ const allFoods: FoodItem[] = [
     amharicName: 'አይብ',
     description: 'Fresh Ethiopian cottage cheese, mild and creamy.',
     emotionalDescription: 'A cooling companion to spicy dishes.',
-    image: '/kuriftu-resort.jpg',
+    image: '/ayib.jpg',
     tags: ['Vegetarian', 'Mild', 'Fresh'],
     spiceLevel: 0,
     rating: 4.4,
@@ -228,7 +181,7 @@ const allFoods: FoodItem[] = [
     amharicName: 'ክክ አልጫ',
     description: 'Mild yellow split pea stew with turmeric and herbs.',
     emotionalDescription: 'Gentle and soothing, perfect for any palate.',
-    image: '/dining-hall.jpg',
+    image: '/kikalicha.jpg',
     tags: ['Vegetarian', 'Mild', 'Comfort'],
     spiceLevel: 1,
     rating: 4.5,
@@ -240,8 +193,10 @@ const allFoods: FoodItem[] = [
     amharicName: 'ትክል ጎመን',
     description: 'Cabbage and potatoes cooked in mild spices and turmeric.',
     emotionalDescription: 'Home-style cooking at its finest.',
-    image: '/ethiopian-landscape.jpg',
+    image: '/tikilgomen.jpg',
     tags: ['Vegetarian', 'Mild', 'Home-style'],
+
+
     spiceLevel: 1,
     rating: 4.4,
     category: 'vegetarian',
@@ -252,7 +207,7 @@ const allFoods: FoodItem[] = [
     amharicName: 'ፋሶሊያ',
     description: 'Green beans and carrots sauteed with onions and mild spices.',
     emotionalDescription: 'Fresh vegetables elevated with Ethiopian technique.',
-    image: '/pool-garden.jpg',
+    image: '/fasolia.jpg',
     tags: ['Vegetarian', 'Fresh', 'Healthy'],
     spiceLevel: 1,
     rating: 4.3,
@@ -264,7 +219,7 @@ const allFoods: FoodItem[] = [
     amharicName: 'በያይነቱ',
     description: 'A colorful platter of various vegetarian dishes on injera.',
     emotionalDescription: 'Experience the full spectrum of Ethiopian flavors in one beautiful presentation.',
-    image: '/culture-hero.jpg',
+    image: '/beyaynetu.jpg',
     tags: ['Vegetarian', 'Variety', 'Sharing'],
     spiceLevel: 2,
     rating: 4.9,
@@ -277,60 +232,13 @@ const allFoods: FoodItem[] = [
     amharicName: 'ፍርፍር',
     description: 'Shredded injera mixed with berbere sauce and niter kibbeh.',
     emotionalDescription: 'The beloved breakfast that starts every Ethiopian day right.',
-    image: '/dining-hall.jpg',
+    image: '/firfir.jpg',
     tags: ['Breakfast', 'Traditional', 'Filling'],
     spiceLevel: 3,
     rating: 4.6,
     category: 'breakfast',
   },
-  {
-    id: '19',
-    name: 'Chechebsa',
-    amharicName: 'ጨጨብሳ',
-    description: 'Shredded flatbread mixed with niter kibbeh and berbere.',
-    emotionalDescription: 'A cozy morning treat that brings back childhood memories.',
-    image: '/kuriftu-resort.jpg',
-    tags: ['Breakfast', 'Comfort', 'Traditional'],
-    spiceLevel: 2,
-    rating: 4.5,
-    category: 'breakfast',
-  },
-  {
-    id: '20',
-    name: 'Kinche',
-    amharicName: 'ቅንጬ',
-    description: 'Cracked wheat porridge with niter kibbeh, simple and nutritious.',
-    emotionalDescription: 'Warm, comforting, and perfect for a peaceful morning.',
-    image: '/ethiopian-landscape.jpg',
-    tags: ['Breakfast', 'Healthy', 'Mild'],
-    spiceLevel: 0,
-    rating: 4.4,
-    category: 'breakfast',
-  },
-  {
-    id: '21',
-    name: 'Enqulal Firfir',
-    amharicName: 'እንቁላል ፍርፍር',
-    description: 'Scrambled eggs with injera pieces, tomatoes, and jalapenos.',
-    emotionalDescription: 'A hearty breakfast that fuels your adventures.',
-    image: '/dining-hall.jpg',
-    tags: ['Breakfast', 'Eggs', 'Filling'],
-    spiceLevel: 2,
-    rating: 4.6,
-    category: 'breakfast',
-  },
-  {
-    id: '22',
-    name: 'Ful',
-    amharicName: 'ፉል',
-    description: 'Fava beans mashed with olive oil, jalapenos, tomatoes, and spices.',
-    emotionalDescription: 'A protein-rich start to your day.',
-    image: '/pool-garden.jpg',
-    tags: ['Breakfast', 'Vegetarian', 'Protein'],
-    spiceLevel: 2,
-    rating: 4.5,
-    category: 'breakfast',
-  },
+
   // Drinks
   {
     id: '23',
@@ -338,7 +246,7 @@ const allFoods: FoodItem[] = [
     amharicName: 'ቡና',
     description: 'Traditional Ethiopian coffee, roasted and brewed in ceremony.',
     emotionalDescription: 'The birthplace of coffee shares its most precious gift.',
-    image: '/buna-ceremony.jpg',
+    image: '/buna.jpg',
     tags: ['Drink', 'Traditional', 'Ceremonial'],
     spiceLevel: 0,
     rating: 5.0,
@@ -350,85 +258,14 @@ const allFoods: FoodItem[] = [
     amharicName: 'ጠጅ',
     description: 'Traditional honey wine, sweet and slightly effervescent.',
     emotionalDescription: 'An ancient drink that celebrates life.',
-    image: '/kuriftu-resort.jpg',
+    image: '/tej.jpg',
     tags: ['Drink', 'Alcoholic', 'Traditional'],
     spiceLevel: 0,
     rating: 4.7,
     category: 'drinks',
   },
-  {
-    id: '25',
-    name: 'Tella',
-    amharicName: 'ጠላ',
-    description: 'Traditional Ethiopian beer made from fermented grains.',
-    emotionalDescription: 'A rustic brew with deep cultural roots.',
-    image: '/dining-hall.jpg',
-    tags: ['Drink', 'Alcoholic', 'Traditional'],
-    spiceLevel: 0,
-    rating: 4.3,
-    category: 'drinks',
-  },
-  {
-    id: '26',
-    name: 'Atmit',
-    amharicName: 'አጥሚት',
-    description: 'Warm barley drink with niter kibbeh, honey, and spices.',
-    emotionalDescription: 'A nourishing drink that heals and comforts.',
-    image: '/pool-garden.jpg',
-    tags: ['Drink', 'Non-alcoholic', 'Warm'],
-    spiceLevel: 0,
-    rating: 4.4,
-    category: 'drinks',
-  },
-  // Sides
-  {
-    id: '27',
-    name: 'Injera',
-    amharicName: 'እንጀራ',
-    description: 'Spongy sourdough flatbread made from teff flour.',
-    emotionalDescription: 'The foundation of every Ethiopian meal, a plate and utensil in one.',
-    image: '/dining-hall.jpg',
-    tags: ['Bread', 'Essential', 'Fermented'],
-    spiceLevel: 0,
-    rating: 4.8,
-    category: 'sides',
-  },
-  {
-    id: '28',
-    name: 'Kocho',
-    amharicName: 'ቆጮ',
-    description: 'Traditional flatbread made from false banana plant.',
-    emotionalDescription: 'A unique Ethiopian staple from the southern highlands.',
-    image: '/ethiopian-landscape.jpg',
-    tags: ['Bread', 'Traditional', 'Regional'],
-    spiceLevel: 0,
-    rating: 4.3,
-    category: 'sides',
-  },
-  {
-    id: '29',
-    name: 'Ambasha',
-    amharicName: 'አምባሻ',
-    description: 'Slightly sweet, spiced Ethiopian bread perfect for holidays.',
-    emotionalDescription: 'A celebratory bread shared with loved ones.',
-    image: '/buna-ceremony.jpg',
-    tags: ['Bread', 'Sweet', 'Festive'],
-    spiceLevel: 0,
-    rating: 4.6,
-    category: 'sides',
-  },
-  {
-    id: '30',
-    name: 'Senafich',
-    amharicName: 'ሰናፍጭ',
-    description: 'Ethiopian mustard sauce, tangy and flavorful.',
-    emotionalDescription: 'The perfect condiment to enhance any dish.',
-    image: '/pool-garden.jpg',
-    tags: ['Condiment', 'Tangy', 'Traditional'],
-    spiceLevel: 1,
-    rating: 4.4,
-    category: 'sides',
-  },
+
+
 ];
 
 const SpiceIndicator = ({ level }: { level: number }) => (
@@ -456,7 +293,7 @@ export default function GebetaTab() {
     { id: 'meat', label: 'Meat', icon: '🥩' },
     { id: 'vegetarian', label: 'Vegetarian', icon: Leaf },
     { id: 'breakfast', label: 'Breakfast', icon: '🍳' },
-    { id: 'drinks', label: 'Drinks', icon: '☕' },
+    { id: 'drinks', label: 'Drinks', icon: '☕️' },
     { id: 'sides', label: 'Sides', icon: '🍞' },
   ];
 
@@ -469,7 +306,7 @@ export default function GebetaTab() {
       {/* Hero Section */}
       <div className="relative h-64 md:h-80 overflow-hidden">
         <Image
-          src="/dining-hall.jpg"
+          src="/gebeta-hero.jpg"
           alt="Ethiopian cuisine"
           fill
           className="object-cover"
@@ -478,7 +315,7 @@ export default function GebetaTab() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-2xl">🍽️</span>
+            <span className="text-2xl">🍽</span>
             <span className="text-accent text-sm font-medium">Gebeta</span>
           </div>
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-white mb-2">
@@ -489,6 +326,7 @@ export default function GebetaTab() {
           </p>
         </div>
       </div>
+
 
       {/* AI Welcome Message */}
       <div className="px-4 md:px-8 -mt-6 relative z-10">
@@ -571,6 +409,7 @@ export default function GebetaTab() {
                     <SpiceIndicator level={item.spiceLevel} />
                   </div>
                   <div className="flex items-center gap-1">
+
                     <Star className="w-4 h-4 fill-current" />
                     <span className="text-sm font-medium">{item.rating}</span>
                   </div>
@@ -662,6 +501,8 @@ export default function GebetaTab() {
                   />
                 </button>
 
+
+
                 {/* Tags */}
                 <div className="absolute bottom-3 left-3 flex flex-wrap gap-1">
                   {item.tags.slice(0, 2).map((tag) => (
@@ -751,3 +592,4 @@ export default function GebetaTab() {
     </div>
   );
 }
+
