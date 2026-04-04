@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -38,23 +38,26 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showPrefsModal, setShowPrefsModal] = useState(false);
-  const { user, isLoaded } = useUser();
-  const checkedPrefs = useRef(false);
+  const { user, isLoaded, isSignedIn } = useUser();
 
-  // Check if user has preferences after auth loads (once only)
+  // Only prompt once: if user already completed prefs, never show again
   useEffect(() => {
-    if (isLoaded && user && !checkedPrefs.current) {
-      checkedPrefs.current = true;
-      fetch('/api/preferences')
-        .then(r => r.json())
-        .then(data => {
-          if (!data.favorite_foods || data.favorite_foods.length === 0) {
-            setShowPrefsModal(true);
-          }
-        })
-        .catch(() => {});
-    }
-  }, [isLoaded, user]);
+    if (!isSignedIn || !isLoaded) return;
+    const promptedKey = `emama-prompted-${user?.id}`;
+    if (typeof window !== 'undefined' && sessionStorage.getItem(promptedKey)) return;
+
+    fetch('/api/preferences')
+      .then(r => r.json())
+      .then(data => {
+        if (!data.favorite_foods || data.favorite_foods.length === 0) {
+          setShowPrefsModal(true);
+        }
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem(promptedKey, 'true');
+        }
+      })
+      .catch(() => {});
+  }, [isSignedIn, isLoaded, user?.id]);
 
   // Prevent hydration mismatch
   useEffect(() => {
