@@ -41,7 +41,7 @@ interface GroupActivity {
 const currentGuests: Guest[] = [
   {
     id: '1',
-    name: user?.firstName || user?.username || 'Guest',
+    name: 'Guest',
     location: 'Addis Ababa',
     interests: ['Coffee', 'Traditional Games', 'Music'],
     avatar: '/guest-1.jpg',
@@ -155,7 +155,7 @@ const sharedMoments: SharedMoment[] = [
     image: '/buna-ceremony.jpg',
     caption: 'Morning coffee ceremony with new friends',
     likes: 12,
-    guestName: user?.firstName || user?.username || 'Guest',
+    guestName: 'Guest',
     timestamp: '2 hours ago',
   },
   {
@@ -247,17 +247,13 @@ const groupActivities: GroupActivity[] = [
   },
 ];
 
-// Personality matches for "Ask Emama to introduce me"
-const personalityMatches: Guest[] = [
-  currentGuests[0],
-  currentGuests[4],
-  currentGuests[8],
-];
-
 export default function CommunityTab() {
   const { user, isLoaded } = useUser();
   const currentUserName = isLoaded ? (user?.firstName || user?.username || 'Guest') : 'Guest';
-  const [isVisible, setIsVisible] = useState(true);
+
+  // Override the first mock guest with the real user's name
+  const guests = currentGuests.map((g, i) => i === 0 ? { ...g, name: currentUserName } : g);
+
   const [likedMoments, setLikedMoments] = useState<string[]>([]);
   const [joinedActivities, setJoinedActivities] = useState<string[]>([]);
   const [showEmamaMessage, setShowEmamaMessage] = useState(true);
@@ -291,7 +287,7 @@ export default function CommunityTab() {
   };
 
   // Find guests with shared interests
-  const sharedInterestGuests = currentGuests.filter(
+  const sharedInterestGuests = guests.filter(
     (g) => g.interests.includes('Traditional Games') && g.id !== '1'
   );
 
@@ -398,7 +394,7 @@ export default function CommunityTab() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {currentGuests.filter(g => g.isVisible).map((guest) => (
+          {guests.filter(g => g.isVisible).map((guest) => (
             <div
               key={guest.id}
               className="bg-white rounded-2xl p-4 shadow-warm-md hover:shadow-warm transition-all duration-300 text-center"
@@ -649,7 +645,7 @@ export default function CommunityTab() {
 
             {/* Matches List */}
             <div className="p-6 space-y-4">
-              {personalityMatches.map((guest) => (
+              {guests.filter(g => g.id === '1' || g.id === '5' || g.id === '9').map((guest) => (
                 <div
                   key={guest.id}
                   className="bg-muted/30 rounded-2xl p-4 border border-border"
