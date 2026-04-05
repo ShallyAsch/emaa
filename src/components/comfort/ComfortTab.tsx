@@ -128,15 +128,34 @@ export default function ComfortTab() {
         };
 
         recognition.onerror = (event: any) => {
-          console.error('Speech recognition error', event.error);
           setIsListening(false);
-          if (event.error !== 'no-speech') {
+          const error = event.error;
+
+          // Don't show toast for silent failures
+          if (error === 'no-speech') return;
+
+          // Network error is common and recoverable
+          if (error === 'network') {
             toast({
-              title: "Voice Input Error",
-              description: "I couldn't hear you clearly. Please try again.",
+              title: "Network Error",
+              description: "Speech recognition needs an internet connection. Please check your connection and try again.",
               variant: "destructive"
             });
+            return;
           }
+
+          // Other errors (not-allowed, aborted, etc.)
+          const messages: Record<string, string> = {
+            'not-allowed': 'Microphone access denied. Please allow mic permissions.',
+            'audio-capture': 'No microphone detected. Please check your device.',
+            'service-not-allowed': 'Speech service not available on this browser.',
+          };
+
+          toast({
+            title: "Voice Input Error",
+            description: messages[error] || "I couldn't hear you clearly. Please try again.",
+            variant: "destructive"
+          });
         };
 
         recognition.onend = () => {
