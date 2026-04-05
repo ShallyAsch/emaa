@@ -180,10 +180,16 @@ export default function ComfortTab() {
       return;
     }
 
-    if (isListening) {
-      recognitionRef.current.stop();
-    } else {
+    // Guard against double-start or starting while processing
+    if (isListening || isProcessingRef.current) {
+      return;
+    }
+
+    try {
       recognitionRef.current.start();
+    } catch (e: any) {
+      // Ignore if already started
+      if (!e.message?.includes('already started')) throw e;
     }
   };
 
