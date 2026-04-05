@@ -151,7 +151,7 @@ export default function ExploreTab() {
       </div>
 
       {/* AI Recommendation Card — Compact */}
-      <div className="px-4 md:px-8 -mt-4 relative z-10">
+      <div className="px-4 md:px-8 mt-4">
         <div className="bg-gradient-to-r from-[#4B3425] to-[#4B3425]/80 rounded-xl p-3.5 flex items-center gap-3 text-white shadow-lg">
           <Sparkles className="w-5 h-5 text-[#D4A017] flex-shrink-0" />
           <p className="text-white/90 text-sm leading-snug">
