@@ -50,7 +50,7 @@ export default function HomeDashboard() {
         </div>
 
         {/* Quick Stats */}
-        <QuickStats weather="24°C, Sunny" sunsetTime="3 hours 45 minutes" />
+        <QuickStats />
 
         {/* What's Happening Now - Scrollable Events */}
         <ScrollableEvents />
