@@ -297,7 +297,7 @@ export default function CommunityTab() {
       {/* Hero Section */}
       <div className="relative h-72 md:h-96 overflow-hidden">
         <Image
-          src="/community-hero.jpg"
+          src="/culture-hero.jpg"
           alt="Our Home Circle"
           fill
           className="object-cover"

@@ -84,7 +84,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     { href: '/gebeta', label: 'Gebeta', icon: UtensilsCrossed },
     { href: '/schedule', label: 'My Schedule', icon: Calendar },
     { href: '/comfort', label: 'Comfort', icon: Wind },
-    { href: '/little-ethiopia', label: 'Little Ethiopia', icon: null, customIcon: 'ET' },
+    { href: '/little-ethiopia', label: 'Little Ethiopia', icon: null, customIcon: '🇪🇹' },
     { href: '/events', label: 'Events', icon: Images },
     { href: '/community', label: 'Community', icon: Users },
     { href: '/memory-box', label: 'Memory Box', icon: BookOpen },
