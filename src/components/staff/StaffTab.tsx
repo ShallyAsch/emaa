@@ -28,7 +28,12 @@ export default function StaffTab() {
       .catch(() => setLoading(false));
   };
 
-  useEffect(() => { fetchRequests(); }, []);
+  useEffect(() => {
+    fetchRequests();
+    // Poll every 5 seconds for real-time updates
+    const interval = setInterval(fetchRequests, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const fulfillRequest = (id: number) => {
     fetch('/api/staff', {
