@@ -3,21 +3,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, AlertCircle, Sun, Moon, Sunset, Lightbulb, User } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { analyzeMoodAndIntent, EmamaAnalysis } from '@/src/lib/aiAnalysis';
 
 type LightingMode = 'day' | 'night' | 'ambient';
-
-interface EmamaSuggestion {
-  icon: string;
-  label: string;
-  action: string;
-}
-
-interface EmamaAnalysis {
-  transcript: string;
-  mood: string;
-  message: string;
-  suggestions: EmamaSuggestion[];
-}
 
 interface LightingOption {
   mode: LightingMode;
@@ -53,25 +41,21 @@ export default function ComfortTab() {
   const [lighting, setLighting] = useState<LightingMode>('ambient');
   const [weather, setWeather] = useState<{ temp: number; condition: string; next_event: { label: string } } | null>(null);
 
-  // Fetch weather on mount
   useEffect(() => {
     fetch('/api/weather')
       .then(r => r.json())
       .then(data => setWeather(data))
       .catch(() => {});
   }, []);
-  
-  // States to represent the lifecycle of a voice command
+
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [analysis, setAnalysis] = useState<EmamaAnalysis | null>(null);
 
-  // Refs for event handlers to avoid stale closures
   const isProcessingRef = useRef(false);
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
-    // Initialize speech recognition if available
     if (typeof window !== 'undefined') {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRecognition) {
@@ -92,33 +76,21 @@ export default function ComfortTab() {
           isProcessingRef.current = true;
 
           try {
-            const res = await fetch('/api/ai-chat', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ type: 'voice', message: transcript }),
-            });
-            const result = await res.json();
-
-            if (!res.ok) {
-              throw new Error(result.details || result.error || 'AI service failed');
-            }
-
+            const result = await analyzeMoodAndIntent(
+              transcript,
+              { roomTemperature: temperature, lightingPreference: lighting as 'day' | 'night' | 'ambient', language: 'en', dietaryRestrictions: [] },
+              {
+                setTemperature,
+                setLighting: (l: string) => setLighting(l as LightingMode),
+                showToast: (title, description) => toast({ title, description })
+              }
+            );
             setAnalysis(result);
-
-            // Auto-apply simple suggestions
-            result.suggestions?.forEach((s: EmamaSuggestion) => {
-              if (s.action.startsWith('temperature:')) {
-                setTemperature(parseInt(s.action.split(':')[1]));
-              }
-              if (s.action.startsWith('lighting:')) {
-                setLighting(s.action.split(':')[1] as LightingMode);
-              }
-            });
           } catch (error) {
-            console.error('Voice AI error:', error);
+            console.error(error);
             toast({
-              title: "Emama couldn't hear you clearly",
-              description: "Please try again or tap the mic to retry.",
+              title: "Emama couldn't analyze that",
+              description: "Please try again.",
               variant: "destructive"
             });
           } finally {
@@ -130,36 +102,30 @@ export default function ComfortTab() {
         recognition.onerror = (event: any) => {
           setIsListening(false);
           const error = event.error;
-
-          // Don't show toast for silent failures
           if (error === 'no-speech') return;
 
-          // Network error is common and recoverable
           if (error === 'network') {
             toast({
               title: "Network Error",
-              description: "Speech recognition needs an internet connection. Please check your connection and try again.",
+              description: "Speech recognition needs an internet connection.",
               variant: "destructive"
             });
             return;
           }
 
-          // Other errors (not-allowed, aborted, etc.)
           const messages: Record<string, string> = {
-            'not-allowed': 'Microphone access denied. Please allow mic permissions.',
-            'audio-capture': 'No microphone detected. Please check your device.',
-            'service-not-allowed': 'Speech service not available on this browser.',
+            'not-allowed': 'Microphone access denied.',
+            'audio-capture': 'No microphone detected.',
+            'service-not-allowed': 'Speech service not available.',
           };
-
           toast({
             title: "Voice Input Error",
-            description: messages[error] || "I couldn't hear you clearly. Please try again.",
+            description: messages[error] || "Couldn't hear you clearly. Please try again.",
             variant: "destructive"
           });
         };
 
         recognition.onend = () => {
-          // Only update UI if we aren't already processing the result to prevent flickering
           if (!isProcessingRef.current) {
             setIsListening(false);
           }
@@ -168,27 +134,23 @@ export default function ComfortTab() {
         recognitionRef.current = recognition;
       }
     }
-  }, [toast]);
+  }, [toast, temperature, lighting]);
 
   const handleVoiceInput = () => {
     if (!recognitionRef.current) {
       toast({
         title: "Browser Not Supported",
-        description: "Voice recognition is not supported in your browser. Please try Chrome, Edge, or Safari.",
+        description: "Use Chrome, Edge, or Safari.",
         variant: "destructive"
       });
       return;
     }
 
-    // Guard against double-start or starting while processing
-    if (isListening || isProcessingRef.current) {
-      return;
-    }
+    if (isListening || isProcessingRef.current) return;
 
     try {
       recognitionRef.current.start();
     } catch (e: any) {
-      // Ignore if already started
       if (!e.message?.includes('already started')) throw e;
     }
   };
@@ -349,7 +311,7 @@ export default function ComfortTab() {
                       <button
                         key={idx}
                         onClick={() => {
-                          if (suggestion.action.startsWith("temperature:")) { setTemperature(parseInt(suggestion.action.split(":")[1])); } if (suggestion.action.startsWith("lighting:")) { setLighting(suggestion.action.split(":")[1] as LightingMode); }
+                          suggestion.action();
                           setAnalysis(null);
                         }}
                         className="text-sm flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-primary font-semibold hover:bg-accent/90 transition-smooth shadow-sm hover:shadow-md"
