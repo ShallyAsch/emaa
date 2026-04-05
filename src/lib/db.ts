@@ -14,78 +14,78 @@ function getDb(): Client {
 }
 
 export async function initDb() {
-  if (dbInitialized) return;
+  // Always try to create missing tables (IF NOT EXISTS is safe)
   const database = getDb();
-  await database.batch([
-    `CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      clerk_id TEXT UNIQUE NOT NULL,
-      username TEXT,
-      email TEXT,
-      first_name TEXT,
-      last_name TEXT,
-      image_url TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    `CREATE TABLE IF NOT EXISTS user_preferences (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      clerk_id TEXT UNIQUE NOT NULL,
-      favorite_foods TEXT DEFAULT '[]',
-      activities TEXT DEFAULT '[]',
-      hobbies TEXT DEFAULT '[]',
-      personality_type TEXT,
-      travel_context TEXT,
-      time_preferences TEXT DEFAULT '[]',
-      dietary_notes TEXT,
-      favorite_seating TEXT,
-      coffee_preference TEXT,
-      special_moments TEXT DEFAULT '[]',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    `CREATE TABLE IF NOT EXISTS booked_events (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      clerk_id TEXT NOT NULL,
-      event_id TEXT NOT NULL,
-      event_title TEXT,
-      event_time TEXT,
-      event_type TEXT,
-      event_image TEXT,
-      booked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE(clerk_id, event_id)
-    )`,
-    `CREATE TABLE IF NOT EXISTS schedule_progress (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      clerk_id TEXT NOT NULL,
-      activity_id TEXT NOT NULL,
-      completed INTEGER DEFAULT 0,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE(clerk_id, activity_id)
-    )`,
-    `CREATE TABLE IF NOT EXISTS service_requests (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      clerk_id TEXT NOT NULL,
-      request_type TEXT NOT NULL,
-      status TEXT DEFAULT 'pending',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      fulfilled_at DATETIME
-    )`,
-    `CREATE TABLE IF NOT EXISTS family_profiles (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      clerk_id TEXT UNIQUE NOT NULL,
-      coffee_preference TEXT DEFAULT 'Traditional Ethiopian buna with honey',
-      dietary_notes TEXT DEFAULT '',
-      favorite_seating TEXT DEFAULT '',
-      previous_visits INTEGER DEFAULT 0,
-      special_moments TEXT DEFAULT '[]',
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
-    `CREATE INDEX IF NOT EXISTS idx_users_clerk_id ON users(clerk_id)`,
-    `CREATE INDEX IF NOT EXISTS idx_prefs_clerk_id ON user_preferences(clerk_id)`,
-    `CREATE INDEX IF NOT EXISTS idx_bookings_clerk ON booked_events(clerk_id)`,
-    `CREATE INDEX IF NOT EXISTS idx_schedule_clerk ON schedule_progress(clerk_id)`,
-  ]);
+  try {
+    await database.batch([
+      `CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        clerk_id TEXT UNIQUE NOT NULL,
+        username TEXT,
+        email TEXT,
+        first_name TEXT,
+        last_name TEXT,
+        image_url TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )`,
+      `CREATE TABLE IF NOT EXISTS user_preferences (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        clerk_id TEXT UNIQUE NOT NULL,
+        favorite_foods TEXT DEFAULT '[]',
+        activities TEXT DEFAULT '[]',
+        hobbies TEXT DEFAULT '[]',
+        personality_type TEXT,
+        travel_context TEXT,
+        time_preferences TEXT DEFAULT '[]',
+        dietary_notes TEXT,
+        favorite_seating TEXT,
+        coffee_preference TEXT,
+        special_moments TEXT DEFAULT '[]',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )`,
+      `CREATE TABLE IF NOT EXISTS booked_events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        clerk_id TEXT NOT NULL,
+        event_id TEXT NOT NULL,
+        event_title TEXT,
+        event_time TEXT,
+        event_type TEXT,
+        event_image TEXT,
+        booked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(clerk_id, event_id)
+      )`,
+      `CREATE TABLE IF NOT EXISTS schedule_progress (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        clerk_id TEXT NOT NULL,
+        activity_id TEXT NOT NULL,
+        completed INTEGER DEFAULT 0,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(clerk_id, activity_id)
+      )`,
+      `CREATE TABLE IF NOT EXISTS service_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        clerk_id TEXT NOT NULL,
+        request_type TEXT NOT NULL,
+        status TEXT DEFAULT 'pending',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        fulfilled_at DATETIME
+      )`,
+      `CREATE TABLE IF NOT EXISTS family_profiles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        clerk_id TEXT UNIQUE NOT NULL,
+        coffee_preference TEXT DEFAULT 'Traditional Ethiopian buna with honey',
+        dietary_notes TEXT DEFAULT '',
+        favorite_seating TEXT DEFAULT '',
+        previous_visits INTEGER DEFAULT 0,
+        special_moments TEXT DEFAULT '[]',
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )`,
+    ]);
+  } catch (err) {
+    console.error('[db] initDb error:', err);
+  }
   dbInitialized = true;
 }
 

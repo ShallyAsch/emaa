@@ -1,6 +1,13 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import { getFamilyProfile, saveFamilyProfile } from '@/src/lib/db';
+import { getFamilyProfile, saveFamilyProfile, initDb } from '@/src/lib/db';
+
+// Ensure tables exist
+let dbReady: Promise<void> | null = null;
+function ensureDb() {
+  if (!dbReady) dbReady = initDb();
+  return dbReady;
+}
 
 const defaultProfile = {
   coffee_preference: 'Traditional Ethiopian buna with honey',
@@ -11,8 +18,8 @@ const defaultProfile = {
 };
 
 export async function GET(req: Request) {
+  await ensureDb();
   const { userId } = await auth();
-  // Use userId if authenticated, or URL param for guest
   const url = new URL(req.url);
   const guestId = url.searchParams.get('guestId');
   const clerkId = userId || (guestId ? `guest-${guestId}` : null);
@@ -28,6 +35,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  await ensureDb();
   const { userId } = await auth();
   const url = new URL(req.url);
   const guestId = url.searchParams.get('guestId');
