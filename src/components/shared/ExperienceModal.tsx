@@ -11,6 +11,7 @@ interface ExperienceModalProps {
   historicalContext?: string;
   videoUrl?: string;
   closingNote?: string;
+  onConfirm?: () => void;
 }
 
 export default function ExperienceModal({
@@ -21,6 +22,7 @@ export default function ExperienceModal({
   historicalContext,
   videoUrl,
   closingNote = "This is part of your home story ❤️",
+  onConfirm,
 }: ExperienceModalProps) {
   if (!isOpen) return null;
 
@@ -86,7 +88,10 @@ export default function ExperienceModal({
               Close
             </button>
             <button
-              onClick={onClose}
+              onClick={() => {
+                onConfirm?.();
+                onClose();
+              }}
               className="flex-1 bg-accent hover:bg-accent/90 text-primary font-semibold py-3 rounded-lg transition-smooth"
             >
               Confirm Reservation

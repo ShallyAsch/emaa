@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { ChevronRight, Share2, Bell, Heart, Zap } from 'lucide-react';
+import { ChevronRight, Share2, Bell, Heart, Zap, Sparkles } from 'lucide-react';
 import ExperienceModal from '@/src/components/shared/ExperienceModal';
 import { mockActivities } from '@/src/lib/mockData';
 
@@ -21,6 +21,7 @@ export default function EventsTab() {
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [savedEvents, setSavedEvents] = useState<Set<string>>(new Set());
   const [notificationEnabled, setNotificationEnabled] = useState<Set<string>>(new Set());
+  const [askingEmama, setAskingEmama] = useState(false);
 
   // Filter cultural events and other events
   const allEvents = mockActivities;
@@ -283,11 +284,37 @@ export default function EventsTab() {
             <span className="font-semibold text-accent">Emama Zinashe</span> can recommend the perfect experience tailored just for you
           </p>
           <button
-            onClick={() => (window.location.href = '/')}
-            className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-3 rounded-lg transition-smooth"
+            onClick={async () => {
+              setAskingEmama(true);
+              try {
+                const res = await fetch('/api/ai-chat', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ type: 'discovery', message: 'Suggest 2 resort activities for today' }),
+                });
+                const data = await res.json();
+                // Add as booked events to localStorage so schedule picks them up
+                const existing = JSON.parse(localStorage.getItem('bookedEvents') || '[]') as BookedEvent[];
+                const newEvents: BookedEvent[] = [
+                  { id: `ai-${Date.now()}-1`, title: data.activity?.name || 'Cultural Experience', time: '3:00 PM', description: data.reasoning || 'Recommended by Emama', image: '/culture-hero.jpg', type: 'cultural' },
+                  { id: `ai-${Date.now()}-2`, title: data.meal?.name || 'Coffee Ceremony', time: '5:00 PM', description: 'Traditional Ethiopian coffee ritual', image: '/buna-ceremony.jpg', type: 'cultural' },
+                ];
+                const merged = [...existing, ...newEvents.filter(n => !existing.find(e => e.title === n.title))];
+                localStorage.setItem('bookedEvents', JSON.stringify(merged));
+                alert(`Emama added ${newEvents.length} activities to your schedule! Check "My Schedule" to see them.`);
+              } catch {
+                alert('Could not reach Emama right now. Please try again.');
+              }
+              setAskingEmama(false);
+            }}
+            disabled={askingEmama}
+            className="inline-flex items-center gap-2 bg-accent hover:bg-accent/90 text-primary font-semibold px-8 py-3 rounded-lg transition-smooth disabled:opacity-60"
           >
-            Ask Emama for Recommendations
-            <ChevronRight className="w-4 h-4" />
+            {askingEmama ? (
+              <><Sparkles className="w-4 h-4 animate-pulse" /> Emama is choosing...</>
+            ) : (
+              <>Ask Emama for Recommendations <ChevronRight className="w-4 h-4" /></>
+            )}
           </button>
         </section>
       </div>
@@ -299,6 +326,9 @@ export default function EventsTab() {
           onClose={() => {
             setSelectedEvent(null);
             setSelectedModal(null);
+          }}
+          onConfirm={() => {
+            bookEvent(selectedEvent);
           }}
           title={selectedEvent.title}
           description={selectedEvent.description}

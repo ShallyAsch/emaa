@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
-import { Clock, MapPin, CheckCircle2, ChevronRight, AlertCircle, Square, CheckSquare } from 'lucide-react';
+import { Clock, MapPin, CheckCircle2, ChevronRight, AlertCircle, Square, CheckSquare, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface ScheduledActivity {
@@ -84,6 +84,7 @@ export default function MyScheduleTab() {
   const [showPreparation, setShowPreparation] = useState<string | null>(null);
   const [allActivities, setAllActivities] = useState<ScheduledActivity[]>(defaultActivities);
   const [checkedActivities, setCheckedActivities] = useState<Set<string>>(new Set());
+  const [addingActivities, setAddingActivities] = useState(false);
 
   // Load booked events + progress from Turso DB
   useEffect(() => {
@@ -386,14 +387,73 @@ export default function MyScheduleTab() {
             Want to Add More Activities?
           </h3>
           <p className="text-foreground/70 mb-6">
-            <span className="font-semibold text-accent">Emama Zinashe</span> can help you explore more experiences tailored to your interests
+            <span className="font-semibold text-accent">Emama Zinashe</span> will find the perfect experiences for your schedule based on your interests
           </p>
           <button
-            onClick={() => (window.location.href = '/')}
-            className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-3 rounded-lg transition-smooth"
+            onClick={async () => {
+              if (!user?.id) return;
+              setAddingActivities(true);
+              try {
+                // Fetch preferences to inform AI
+                const prefsRes = await fetch('/api/preferences');
+                const prefs = await prefsRes.json();
+                const prefsStr = prefs.favorite_foods?.length || prefs.activities?.length
+                  ? `Interests: ${(prefs.favorite_foods || []).join(', ')}. Activities: ${(prefs.activities || []).join(', ')}. Personality: ${prefs.personality_type || ''}. Traveling: ${prefs.travel_context || ''}.`
+                  : '';
+
+                // Get AI suggestions
+                const aiRes = await fetch('/api/ai-chat', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ type: 'discovery', message: `Suggest 2 activities for a resort schedule. ${prefsStr}` }),
+                });
+                const aiData = await aiRes.json();
+
+                // Add to schedule
+                const newActivities: ScheduledActivity[] = [
+                  {
+                    id: `ai-${Date.now()}-1`,
+                    time: '3:00 PM',
+                    title: aiData.activity?.name || 'Cultural Experience',
+                    location: 'Resort Venue',
+                    description: aiData.reasoning || 'Curated by Emama Zinashe for you',
+                    whatToWear: ['Comfortable clothing', 'Appropriate footwear'],
+                    preparation: ['Arrive 10 minutes early', 'Bring an open mind'],
+                    image: '/culture-hero.jpg',
+                    completed: false,
+                    fromBooking: false,
+                  },
+                  {
+                    id: `ai-${Date.now()}-2`,
+                    time: '5:00 PM',
+                    title: aiData.meal?.name || 'Sunset Coffee Ceremony',
+                    location: 'Garden Pavilion',
+                    description: 'A relaxing Ethiopian coffee ceremony to unwind',
+                    whatToWear: ['Light, comfortable clothing'],
+                    preparation: ['Come hungry', 'Enjoy the experience'],
+                    image: '/buna-ceremony.jpg',
+                    completed: false,
+                    fromBooking: false,
+                  },
+                ];
+                setAllActivities(prev => [...prev, ...newActivities]);
+              } catch (err) {
+                console.error('Failed to add activities:', err);
+              }
+              setAddingActivities(false);
+            }}
+            disabled={addingActivities}
+            className="inline-flex items-center gap-2 bg-accent hover:bg-accent/90 text-primary font-semibold px-8 py-3 rounded-lg transition-smooth disabled:opacity-60"
           >
-            Ask Emama
-            <ChevronRight className="w-4 h-4" />
+            {addingActivities ? (
+              <>
+                <Sparkles className="w-4 h-4 animate-pulse" /> Emama is finding activities...
+              </>
+            ) : (
+              <>
+                Ask Emama <ChevronRight className="w-4 h-4" />
+              </>
+            )}
           </button>
         </section>
 
