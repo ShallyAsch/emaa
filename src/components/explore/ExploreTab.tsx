@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
-import { MapPin, Star, Clock } from 'lucide-react';
+import { MapPin, Star, Clock, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface Location {
@@ -175,16 +175,35 @@ export default function ExploreTab() {
         </p>
       </div>
 
-      {/* Map Section */}
+      {/* Map Section - Satellite View */}
       <div className="relative w-full h-[40vh] md:h-[50vh] bg-muted overflow-hidden">
         <iframe
-          src={`https://maps.google.com/maps?q=${KURIFTU_LAT},${KURIFTU_LNG}&t=m&z=14&ie=UTF8&iwloc=&output=embed`}
+          src={`https://maps.google.com/maps?q=${KURIFTU_LAT},${KURIFTU_LNG}&t=k&z=16&ie=UTF8&iwloc=&output=embed`}
           width="100%" height="100%" style={{ border: 0 }}
           allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
-          className="w-full h-full" title="Kuriftu Resort Map"
+          className="w-full h-full" title="Kuriftu Resort Satellite Map"
         />
         <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow text-xs text-[#4B3425]">
           📍 Kuriftu African Village, Bishoftu
+        </div>
+      </div>
+
+      {/* AI Recommendation Card */}
+      <div className="mx-4 md:mx-8 -mt-8 relative z-10">
+        <div className="bg-gradient-to-r from-[#4B3425] to-[#4B3425]/80 rounded-2xl p-5 text-white shadow-2xl">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg mb-1">Emama recommends</h3>
+              <p className="text-white/80 text-sm">
+                {isLoaded && user
+                  ? `Based on your preferences, I've curated the best experiences around Kuriftu just for you, ${user.firstName || 'guest'}!`
+                  : 'Sign in to get personalized recommendations based on your interests. Otherwise, explore all the amazing places around Kuriftu!'}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
