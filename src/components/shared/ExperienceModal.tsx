@@ -77,13 +77,21 @@ export default function ExperienceModal({
             <p className="text-sm font-semibold text-primary italic">{closingNote}</p>
           </div>
 
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 rounded-lg transition-smooth"
-          >
-            Close & Return Home
-          </button>
+          {/* Action Buttons */}
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 rounded-lg transition-smooth"
+            >
+              Close
+            </button>
+            <button
+              onClick={onClose}
+              className="flex-1 bg-accent hover:bg-accent/90 text-primary font-semibold py-3 rounded-lg transition-smooth"
+            >
+              Confirm Reservation
+            </button>
+          </div>
         </div>
       </div>
     </div>
