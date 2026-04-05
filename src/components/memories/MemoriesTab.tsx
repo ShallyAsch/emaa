@@ -1,12 +1,54 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { mockMemories, mockGuest } from '@/src/lib/mockData';
+import { useUser } from '@clerk/nextjs';
+import { mockMemories } from '@/src/lib/mockData';
 import FamilyProfileEditor from './FamilyProfileEditor';
 
+const defaultProfile = {
+  coffeePreference: 'Traditional Ethiopian buna with honey',
+  dietaryNotes: '',
+  favoriteSeating: 'Window overlooking the garden',
+  previousVisits: 3,
+  specialMoments: [
+    'Sunset ceremony in the garden',
+    'Traditional cooking class',
+    'Mountain trek',
+  ],
+};
+
 export default function MemoriesTab() {
+  const { user, isLoaded } = useUser();
   const [showProfileEditor, setShowProfileEditor] = useState(false);
+  const [profile, setProfile] = useState(defaultProfile);
+  const [loaded, setLoaded] = useState(false);
+
+  // Fetch family profile from DB
+  useEffect(() => {
+    if (!isLoaded || !user) return;
+    fetch('/api/family-profile')
+      .then(r => r.json())
+      .then(data => {
+        setProfile({
+          coffeePreference: data.coffee_preference || defaultProfile.coffeePreference,
+          dietaryNotes: data.dietary_notes || defaultProfile.dietaryNotes,
+          favoriteSeating: data.favorite_seating || defaultProfile.favoriteSeating,
+          previousVisits: data.previous_visits || defaultProfile.previousVisits,
+          specialMoments: data.special_moments || defaultProfile.specialMoments,
+        });
+        setLoaded(true);
+      })
+      .catch(() => setLoaded(true));
+  }, [isLoaded, user]);
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full md:pr-24">
@@ -38,15 +80,11 @@ export default function MemoriesTab() {
                   fill
                   className="object-cover group-hover:scale-110 transition-smooth duration-500"
                 />
-
-                {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-smooth flex flex-col justify-end p-4">
                   <h3 className="font-semibold text-white text-sm">
                     {memory.title}
                   </h3>
                   <p className="text-xs text-white/80">{memory.date}</p>
-
-                  {/* Action Button */}
                   <button className="mt-3 px-3 py-1 bg-accent/20 text-accent rounded-lg text-xs font-medium hover:bg-accent/30 transition-smooth">
                     Book similar
                   </button>
@@ -72,8 +110,15 @@ export default function MemoriesTab() {
 
           {showProfileEditor ? (
             <FamilyProfileEditor
-              profile={mockGuest.familyProfile}
+              profile={{
+                coffeePreference: profile.coffeePreference,
+                dietaryNotes: profile.dietaryNotes,
+                favoriteSeating: profile.favoriteSeating,
+                previousVisits: profile.previousVisits,
+                specialMoments: profile.specialMoments,
+              }}
               onClose={() => setShowProfileEditor(false)}
+              onSave={(updated) => setProfile(updated)}
             />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -83,7 +128,7 @@ export default function MemoriesTab() {
                   ☕ Coffee Preference
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {mockGuest.familyProfile.coffeePreference}
+                  {profile.coffeePreference}
                 </p>
               </div>
 
@@ -93,7 +138,7 @@ export default function MemoriesTab() {
                   🍽️ Dietary Notes
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {mockGuest.familyProfile.dietaryNotes}
+                  {profile.dietaryNotes || 'No dietary notes set'}
                 </p>
               </div>
 
@@ -103,7 +148,7 @@ export default function MemoriesTab() {
                   🪑 Favorite Seating
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {mockGuest.familyProfile.favoriteSeating}
+                  {profile.favoriteSeating || 'No preference set'}
                 </p>
               </div>
 
@@ -113,8 +158,8 @@ export default function MemoriesTab() {
                   🏠 Previous Visits
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  You have stayed with us {mockGuest.familyProfile.previousVisits}{' '}
-                  {mockGuest.familyProfile.previousVisits === 1 ? 'time' : 'times'}
+                  You have stayed with us {profile.previousVisits}{' '}
+                  {profile.previousVisits === 1 ? 'time' : 'times'}
                 </p>
               </div>
             </div>
@@ -122,13 +167,13 @@ export default function MemoriesTab() {
         </div>
 
         {/* Special Moments */}
-        {mockGuest.familyProfile.specialMoments.length > 0 && (
+        {profile.specialMoments.length > 0 && (
           <div className="glass p-6 rounded-2xl">
             <h3 className="font-semibold text-foreground mb-4">
               ✨ Special Moments
             </h3>
             <ul className="space-y-2">
-              {mockGuest.familyProfile.specialMoments.map((moment, idx) => (
+              {profile.specialMoments.map((moment, idx) => (
                 <li
                   key={idx}
                   className="flex items-center gap-2 text-sm text-muted-foreground"

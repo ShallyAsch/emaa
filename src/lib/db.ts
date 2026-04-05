@@ -71,6 +71,16 @@ export async function initDb() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       fulfilled_at DATETIME
     )`,
+    `CREATE TABLE IF NOT EXISTS family_profiles (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      clerk_id TEXT UNIQUE NOT NULL,
+      coffee_preference TEXT DEFAULT 'Traditional Ethiopian buna with honey',
+      dietary_notes TEXT DEFAULT '',
+      favorite_seating TEXT DEFAULT '',
+      previous_visits INTEGER DEFAULT 0,
+      special_moments TEXT DEFAULT '[]',
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
     `CREATE INDEX IF NOT EXISTS idx_users_clerk_id ON users(clerk_id)`,
     `CREATE INDEX IF NOT EXISTS idx_prefs_clerk_id ON user_preferences(clerk_id)`,
     `CREATE INDEX IF NOT EXISTS idx_bookings_clerk ON booked_events(clerk_id)`,
@@ -299,6 +309,55 @@ export async function fulfillServiceRequest(id: number) {
     sql: 'UPDATE service_requests SET status = ?, fulfilled_at = CURRENT_TIMESTAMP WHERE id = ?',
     args: ['fulfilled', id],
   });
+}
+
+// === Family Profiles ===
+
+export async function saveFamilyProfile(clerk_id: string, profile: {
+  coffee_preference?: string;
+  dietary_notes?: string;
+  favorite_seating?: string;
+  previous_visits?: number;
+  special_moments?: string[];
+}) {
+  const database = getDb();
+  await database.execute({
+    sql: `INSERT INTO family_profiles (clerk_id, coffee_preference, dietary_notes, favorite_seating, previous_visits, special_moments)
+          VALUES (?, ?, ?, ?, ?, ?)
+          ON CONFLICT(clerk_id) DO UPDATE SET
+            coffee_preference = excluded.coffee_preference,
+            dietary_notes = excluded.dietary_notes,
+            favorite_seating = excluded.favorite_seating,
+            previous_visits = excluded.previous_visits,
+            special_moments = excluded.special_moments,
+            updated_at = CURRENT_TIMESTAMP`,
+    args: [
+      clerk_id,
+      profile.coffee_preference || '',
+      profile.dietary_notes || '',
+      profile.favorite_seating || '',
+      profile.previous_visits || 0,
+      JSON.stringify(profile.special_moments || []),
+    ],
+  });
+}
+
+export async function getFamilyProfile(clerk_id: string) {
+  const database = getDb();
+  const result = await database.execute({
+    sql: 'SELECT * FROM family_profiles WHERE clerk_id = ?',
+    args: [clerk_id],
+  });
+  const row = result.rows[0];
+  if (!row) return null;
+
+  return {
+    coffee_preference: row.coffee_preference as string,
+    dietary_notes: row.dietary_notes as string,
+    favorite_seating: row.favorite_seating as string,
+    previous_visits: row.previous_visits as number,
+    special_moments: JSON.parse((row.special_moments as string) || '[]') as string[],
+  };
 }
 
 export default getDb;

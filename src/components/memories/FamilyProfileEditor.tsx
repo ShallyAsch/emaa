@@ -1,27 +1,45 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FamilyProfile } from '@/src/lib/types';
 
 interface FamilyProfileEditorProps {
-  profile: FamilyProfile;
+  profile: {
+    coffeePreference: string;
+    dietaryNotes: string;
+    favoriteSeating: string;
+    previousVisits: number;
+    specialMoments: string[];
+  };
   onClose: () => void;
+  onSave?: (profile: any) => void;
 }
 
 export default function FamilyProfileEditor({
   profile,
   onClose,
+  onSave,
 }: FamilyProfileEditorProps) {
   const [formData, setFormData] = useState(profile);
+  const [saving, setSaving] = useState(false);
 
-  const handleChange = (field: keyof FamilyProfile, value: string) => {
+  const handleChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Save to backend here
-    console.log('Saving profile:', formData);
+    setSaving(true);
+    try {
+      const res = await fetch('/api/family-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok && onSave) onSave(formData);
+    } catch {
+      // Save failed silently
+    }
+    setSaving(false);
     onClose();
   };
 
@@ -34,9 +52,7 @@ export default function FamilyProfileEditor({
         </label>
         <textarea
           value={formData.coffeePreference}
-          onChange={(e) =>
-            handleChange('coffeePreference', e.target.value)
-          }
+          onChange={(e) => handleChange('coffeePreference', e.target.value)}
           className="w-full px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent"
           rows={2}
           placeholder="How do you like your coffee?"
@@ -65,9 +81,7 @@ export default function FamilyProfileEditor({
         <input
           type="text"
           value={formData.favoriteSeating}
-          onChange={(e) =>
-            handleChange('favoriteSeating', e.target.value)
-          }
+          onChange={(e) => handleChange('favoriteSeating', e.target.value)}
           className="w-full px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent"
           placeholder="Where do you like to sit?"
         />
@@ -77,9 +91,10 @@ export default function FamilyProfileEditor({
       <div className="flex gap-3 pt-4">
         <button
           type="submit"
-          className="flex-1 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg font-medium text-sm hover:opacity-90 transition-smooth"
+          disabled={saving}
+          className="flex-1 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg font-medium text-sm hover:opacity-90 transition-smooth disabled:opacity-50"
         >
-          Save Changes
+          {saving ? 'Saving...' : 'Save Changes'}
         </button>
         <button
           type="button"
