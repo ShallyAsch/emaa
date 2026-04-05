@@ -111,11 +111,103 @@ function analyzeWithKeywords(text: string, settings?: AIRequestBody['settings'])
     };
   }
 
+  if (/\b(dinner|breakfast|lunch|food|eat|restaurant|meal|menu|hungry)\b/.test(lower)) {
+    return {
+      mood: 'hungry',
+      intent: 'general_chat',
+      confidence: 0.75,
+      message: "Our restaurant is open and ready for you! I recommend trying our authentic Ethiopian dishes. Would you like me to suggest something from the menu? Head to Gebeta to see all options.",
+      actions: [],
+    };
+  }
+
+  if (/\b(wifi|internet|connection|network)\b/.test(lower)) {
+    return {
+      mood: 'relaxed',
+      intent: 'general_chat',
+      confidence: 0.70,
+      message: "Our high-speed WiFi is available throughout the resort. The network name is 'EndeBete-Guest' and the password is on your room card. Let me know if you need help connecting!",
+      actions: [],
+    };
+  }
+
+  if (/\b(spa|massage|wellness|relax|treatment)\b/.test(lower)) {
+    return {
+      mood: 'stressed',
+      intent: 'general_chat',
+      confidence: 0.75,
+      message: "Our spa is wonderful! We offer traditional African treatments, hot stone massages, and aromatherapy. I can suggest dimming the lights here while you book your spa appointment.",
+      actions: [
+        { type: 'set_lighting', value: 'night', label: 'Set Relaxing Lighting', icon: '🕯️' },
+      ],
+    };
+  }
+
+  if (/\b(story|tell|history|culture|tradition|heritage)\b/.test(lower)) {
+    return {
+      mood: 'happy',
+      intent: 'general_chat',
+      confidence: 0.72,
+      message: "Our resort is inspired by centuries of Ethiopian hospitality. The tradition of 'gursha' — feeding those you love by hand — represents the warmth we bring to every guest. Visit Little Ethiopia to explore more of our culture!",
+      actions: [],
+    };
+  }
+
+  if (/\b(weather|rain|sun|outside|outdoor)\b/.test(lower)) {
+    return {
+      mood: 'relaxed',
+      intent: 'general_chat',
+      confidence: 0.70,
+      message: "The weather today is lovely! Our garden terrace is perfect for enjoying the view. The sunset is especially beautiful from the poolside. Would you like me to suggest a good time to go?",
+      actions: [],
+    };
+  }
+
+  if (/\b(activity|thing|do|fun|explore|suggest|recommend)\b/.test(lower)) {
+    return {
+      mood: 'happy',
+      intent: 'general_chat',
+      confidence: 0.75,
+      message: "There's so much to enjoy! Our cultural experiences, spa treatments, garden walks, and dining are all wonderful. I'd suggest starting with a coffee ceremony — it's truly special. Want me to check what's happening today?",
+      actions: [],
+    };
+  }
+
+  if (/\b(thank|thanks|appreciate)\b/.test(lower)) {
+    return {
+      mood: 'happy',
+      intent: 'general_chat',
+      confidence: 0.90,
+      message: "You're so welcome, my dear. It's my pleasure to make your stay comfortable. You're family here ❤️",
+      actions: [],
+    };
+  }
+
+  if (/\b(hello|hi|hey|selam|good morning|good evening)\b/.test(lower)) {
+    return {
+      mood: 'happy',
+      intent: 'general_chat',
+      confidence: 0.90,
+      message: "Selam, my dear! Welcome home. I'm so happy to have you here. What can I help you with today?",
+      actions: [],
+    };
+  }
+
+  if (/\b(help|need|can you|please|want|would like)\b/.test(lower)) {
+    return {
+      mood: 'neutral',
+      intent: 'general_chat',
+      confidence: 0.65,
+      message: "Of course, my dear. I'm here to make your stay perfect. Tell me what you need — whether it's adjusting your room, ordering something, or just finding something wonderful to do today.",
+      actions: [],
+    };
+  }
+
   return {
     mood: 'neutral',
     intent: 'general_chat',
     confidence: 0.50,
-    message: "I understand. How else can I help you today?",
+    message: "Thank you for sharing that, my dear. Is there anything I can do to make your stay more comfortable? I can adjust your room, suggest an activity, or bring you something you need.",
     actions: [],
   };
 }
@@ -156,10 +248,11 @@ Rules:
 - Be warm, caring, and speak like a loving Ethiopian grandmother
 - Use confidence scores honestly. If you provide an action based on a clear explicit intent OR a clear mood (e.g. cold, hot, tired, bright), assign a confidence >= 0.85 so the system will auto-apply it.
 - If the user explicitly mentions feeling a certain mood (e.g., "I'm tired", "I am freezing", "It's so bright", "I feel stressed"), ALWAYS provide a relevant set_lighting or set_temperature action to improve their comfort. Do not just chat; take action.
+- If the user asks a general question (about food, wifi, activities, weather, culture), give a SPECIFIC, HELPFUL response with real details about the resort. Never give a generic "I understand" response.
 - For temperature changes, suggest increments of 2°C, clamped to 16-28°C
-- Valid lighting values: "day" | "night" | "ambient"
+- Valid lighting: "day" | "night" | "ambient"
 - Always provide at least one action when intent is not "general_chat" or when improving a mood.
-- Keep messages concise but heartfelt`;
+- Keep messages concise but heartfelt. Respond like a caring grandmother who knows everything about the resort.`;
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 15000);
