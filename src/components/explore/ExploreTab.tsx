@@ -42,10 +42,15 @@ export default function ExploreTab() {
       {/* Satellite Map */}
       <div className="relative w-full h-[35vh] md:h-[45vh] overflow-hidden">
         <iframe
-          src={`https://maps.google.com/maps?q=${KURIFTU_LAT},${KURIFTU_LNG}&t=k&z=20&ie=UTF8&iwloc=&output=embed`}
-          width="100%" height="100%" style={{ border: 0 }}
-          allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
-          className="w-full h-full" title="Kuriftu Resort Satellite View"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3943.435790406834!2d38.99808387588147!3d8.78241519126938!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x164b8cba17a8c725%3A0x24fb2798676731e7!2sKuriftu%20Resort%20%26%20Spa%20Bishoftu!5e0!3m2!1sen!2set!4v1712350000000!5m2!1sen!2set"
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          className="w-full h-full"
+          title="Kuriftu Resort Map"
         />
         <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-2.5 py-1 rounded-md shadow text-xs font-medium text-[#4B3425]">
           📍 Kuriftu African Village, Bishoftu
