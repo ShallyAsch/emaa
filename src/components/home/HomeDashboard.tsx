@@ -131,7 +131,7 @@ export default function HomeDashboard() {
               <div className="flex items-center gap-3 mb-4">
                 <div className="relative w-14 h-14 rounded-full overflow-hidden">
                   <Image
-                    src="/guest-1.jpg"
+                    src="/guest-2.jpg"
                     alt="Ato Bekele"
                     fill
                     className="object-cover"
@@ -150,7 +150,7 @@ export default function HomeDashboard() {
               <div className="flex items-center gap-3 mb-4">
                 <div className="relative w-14 h-14 rounded-full overflow-hidden">
                   <Image
-                    src="/guest-2.jpg"
+                    src="/guest-1.jpg"
                     alt="Weizero Tigist"
                     fill
                     className="object-cover"
