@@ -63,6 +63,14 @@ export async function initDb() {
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       UNIQUE(clerk_id, activity_id)
     )`,
+    `CREATE TABLE IF NOT EXISTS service_requests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      clerk_id TEXT NOT NULL,
+      request_type TEXT NOT NULL,
+      status TEXT DEFAULT 'pending',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      fulfilled_at DATETIME
+    )`,
     `CREATE INDEX IF NOT EXISTS idx_users_clerk_id ON users(clerk_id)`,
     `CREATE INDEX IF NOT EXISTS idx_prefs_clerk_id ON user_preferences(clerk_id)`,
     `CREATE INDEX IF NOT EXISTS idx_bookings_clerk ON booked_events(clerk_id)`,
@@ -240,6 +248,44 @@ export async function getScheduleProgress(clerk_id: string) {
     if ((row.completed as number) === 1) completed.add(row.activity_id as string);
   });
   return completed;
+}
+
+// === Service Requests ===
+
+export async function createServiceRequest(clerk_id: string, request_type: string) {
+  const database = getDb();
+  await database.execute({
+    sql: 'INSERT INTO service_requests (clerk_id, request_type) VALUES (?, ?)',
+    args: [clerk_id, request_type],
+  });
+}
+
+export async function getServiceRequests() {
+  const database = getDb();
+  const result = await database.execute({
+    sql: `SELECT sr.*, u.first_name, u.email
+          FROM service_requests sr
+          LEFT JOIN users u ON sr.clerk_id = u.clerk_id
+          ORDER BY sr.created_at DESC`,
+    args: [],
+  });
+  return result.rows.map(row => ({
+    id: row.id as number,
+    clerk_id: row.clerk_id as string,
+    request_type: row.request_type as string,
+    status: row.status as string,
+    created_at: row.created_at as string,
+    first_name: row.first_name as string | null,
+    email: row.email as string | null,
+  }));
+}
+
+export async function fulfillServiceRequest(id: number) {
+  const database = getDb();
+  await database.execute({
+    sql: 'UPDATE service_requests SET status = ?, fulfilled_at = CURRENT_TIMESTAMP WHERE id = ?',
+    args: ['fulfilled', id],
+  });
 }
 
 export default getDb;

@@ -1,5 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
+import { createServiceRequest } from '@/src/lib/db';
 
 const serviceLabels: Record<string, string> = {
   pillows: 'Extra Pillows',
@@ -15,8 +16,7 @@ export async function POST(req: Request) {
   try {
     const { type } = await req.json();
     const label = serviceLabels[type] || type;
-    // TODO: Store in DB (add service_requests table) or send to staff system
-    console.log(`Service request from ${userId}: ${label}`);
+    await createServiceRequest(userId, label);
     return NextResponse.json({ success: true, message: `${label} requested` });
   } catch (err) {
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
