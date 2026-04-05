@@ -12,6 +12,7 @@ interface Event {
   description: string;
   color: string;
   image: string;
+  link: string;
 }
 
 const mockEvents: Event[] = [
@@ -21,7 +22,8 @@ const mockEvents: Event[] = [
     time: '3:00 PM',
     description: 'Join us for traditional coffee',
     color: 'bg-amber-100',
-    image: '/icons/coffee-ceremony.jpg',
+    image: '/buna-ceremony.jpg',
+    link: '/little-ethiopia',
   },
   {
     id: '2',
@@ -29,7 +31,8 @@ const mockEvents: Event[] = [
     time: '6:30 PM',
     description: 'Family-style dining',
     color: 'bg-orange-100',
-    image: '/icons/dinner-service.jpg',
+    image: '/dining-hall.jpg',
+    link: '/gebeta',
   },
   {
     id: '3',
@@ -37,7 +40,8 @@ const mockEvents: Event[] = [
     time: '8:00 PM',
     description: 'Traditional performances',
     color: 'bg-rose-100',
-    image: '/icons/evening-music.jpg',
+    image: '/images.jpg',
+    link: '/events',
   },
   {
     id: '4',
@@ -45,7 +49,8 @@ const mockEvents: Event[] = [
     time: '2:00 PM',
     description: 'Relaxation & wellness',
     color: 'bg-green-100',
-    image: '/icons/spa-session.jpg',
+    image: '/images.jpg',
+    link: '/comfort',
   },
 ];
 
@@ -83,9 +88,9 @@ export default function ScrollableEvents() {
                   </span>
                 </div>
                 <p className="text-sm text-foreground/70">{event.description}</p>
-                <button className="w-full mt-2 bg-white/80 hover:bg-white text-primary font-semibold py-2 rounded-lg transition-smooth">
+                <Link href={event.link} className="block w-full mt-2 bg-white/80 hover:bg-white text-primary font-semibold py-2 rounded-lg text-center transition-smooth">
                   Learn More
-                </button>
+                </Link>
               </div>
             </div>
           ))}
