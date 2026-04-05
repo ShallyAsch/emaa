@@ -161,7 +161,6 @@ export default function ExploreTab() {
     ? suggestions
     : suggestions.filter(l => l.type === activeFilter);
 
-  const mapLocation = selectedLocation || { name: 'Kuriftu African Village Bishoftu, Ethiopia', lat: KURIFTU_LAT, lng: KURIFTU_LNG };
 
   return (
     <div className="min-h-screen bg-background">
