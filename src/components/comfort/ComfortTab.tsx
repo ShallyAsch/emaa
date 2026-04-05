@@ -65,8 +65,9 @@ export default function ComfortTab() {
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [analysis, setAnalysis] = useState<EmamaAnalysis | null>(null);
-  
-  // Speech Recognition instance ref
+
+  // Refs for event handlers to avoid stale closures
+  const isProcessingRef = useRef(false);
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
@@ -88,6 +89,7 @@ export default function ComfortTab() {
           const transcript = event.results[0][0].transcript;
           setIsListening(false);
           setIsProcessing(true);
+          isProcessingRef.current = true;
 
           try {
             const res = await fetch('/api/ai-chat', {
@@ -121,6 +123,7 @@ export default function ComfortTab() {
             });
           } finally {
             setIsProcessing(false);
+            isProcessingRef.current = false;
           }
         };
 
@@ -137,7 +140,10 @@ export default function ComfortTab() {
         };
 
         recognition.onend = () => {
-          setIsListening(false);
+          // Only update UI if we aren't already processing the result to prevent flickering
+          if (!isProcessingRef.current) {
+            setIsListening(false);
+          }
         };
 
         recognitionRef.current = recognition;
@@ -223,10 +229,10 @@ export default function ComfortTab() {
 
             <div className="flex flex-col items-center gap-6 relative z-10">
               {/* Central Mic/Processing Button */}
-              <button 
+              <button
                 onClick={handleVoiceInput}
                 disabled={isProcessing}
-                className="relative group focus:outline-none"
+                className={`relative group focus:outline-none ${isProcessing ? 'cursor-wait opacity-80' : ''}`}
               >
                 <div
                   className={`w-24 h-24 md:w-32 md:h-32 rounded-full flex items-center justify-center transition-all duration-500 ${
