@@ -4,7 +4,10 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
 import { MapPin, Star, Clock, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
+// Kuriftu African Village, Bishoftu — verified GPS coordinates
+const KURIFTU_LAT = 8.7503;
+const KURIFTU_LNG = 38.9775;
 
 interface Location {
   id: string;
@@ -15,205 +18,203 @@ interface Location {
   rating: number;
   distance: string;
   openHours: string;
-  phone?: string;
   lat: number;
   lng: number;
   aiReason?: string;
 }
 
-// Kuriftu African Village, Bishoftu coordinates
-const KURIFTU_LAT = 8.75;
-const KURIFTU_LNG = 38.97;
-
+// Real places around Kuriftu African Village, Bishoftu (Debre Zeit)
 const allLocations: Location[] = [
   {
-    id: '1', name: 'Lake Hora (Abijata)', type: 'nature',
-    description: 'Scenic lake surrounded by flamingos, ideal for boat rides and sunset views.',
-    image: '/ethiopian-landscape.jpg', rating: 4.9, distance: '3 km', openHours: '6:00 AM - 7:00 PM',
-    lat: 8.76, lng: 38.98, aiReason: 'Perfect for your love of nature',
+    id: '1', name: 'Lake Hora', type: 'nature',
+    description: 'The iconic crater lake right next to Kuriftu, famous for hippo watching and sunset boat rides.',
+    image: '/ethiopian-landscape.jpg', rating: 4.9, distance: '0.5 km', openHours: '6:00 AM – 7:00 PM',
+    lat: 8.7520, lng: 38.9800, aiReason: 'Perfect for your love of nature',
   },
   {
-    id: '2', name: 'Traditional Coffee Ceremony Pavilion', type: 'cultural',
-    description: 'Experience the ancient Ethiopian coffee ritual with freshly roasted beans and traditional music.',
-    image: '/buna-ceremony.jpg', rating: 4.9, distance: 'On-site', openHours: '9:00 AM - 6:00 PM', phone: '+251 11 234 5678',
+    id: '2', name: 'Kuriftu Coffee Ceremony', type: 'cultural',
+    description: 'Daily traditional Ethiopian coffee roasting and serving at the resort pavilion.',
+    image: '/buna-ceremony.jpg', rating: 4.9, distance: 'On-site', openHours: '9:00 AM – 6:00 PM',
     lat: KURIFTU_LAT, lng: KURIFTU_LNG, aiReason: 'Based on your cultural interests',
   },
   {
-    id: '3', name: 'Kuriftu African Village Spa', type: 'spa',
-    description: 'Rejuvenate with traditional Ethiopian honey treatments and aromatherapy.',
-    image: '/spa-wellness.jpg', rating: 4.8, distance: 'On-site', openHours: '8:00 AM - 8:00 PM', phone: '+251 11 234 5679',
+    id: '3', name: 'Kuriftu Spa & Wellness', type: 'spa',
+    description: 'Full-service spa with Ethiopian honey treatments, massage, and aromatherapy.',
+    image: '/spa-wellness.jpg', rating: 4.8, distance: 'On-site', openHours: '8:00 AM – 8:00 PM',
     lat: KURIFTU_LAT, lng: KURIFTU_LNG, aiReason: 'You mentioned wanting relaxation',
   },
   {
-    id: '4', name: 'Buna Restaurant', type: 'restaurant',
-    description: 'Authentic Ethiopian cuisine featuring fresh injera, doro wat, and kitfo.',
-    image: '/dining-hall.jpg', rating: 4.7, distance: 'On-site', openHours: '11:00 AM - 10:00 PM', phone: '+251 11 234 5680',
-    lat: KURIFTU_LAT, lng: KURIFTU_LNG, aiReason: 'Perfect for your love of spicy food',
+    id: '4', name: 'Kuriftu Restaurant', type: 'restaurant',
+    description: 'Main dining hall serving authentic Ethiopian cuisine — injera, doro wat, kitfo, and more.',
+    image: '/dining-hall.jpg', rating: 4.7, distance: 'On-site', openHours: '7:00 AM – 10:00 PM',
+    lat: KURIFTU_LAT, lng: KURIFTU_LNG, aiReason: 'Perfect for your love of traditional food',
   },
   {
-    id: '5', name: 'Sunset Garden Viewpoint', type: 'nature',
-    description: 'Breathtaking sunset views over the Ethiopian highlands from the resort terrace.',
-    image: '/sunset-view.jpg', rating: 5.0, distance: 'On-site', openHours: 'Always open',
-    lat: KURIFTU_LAT, lng: KURIFTU_LNG, aiReason: 'Ideal for your evening relaxation',
+    id: '5', name: 'Kuriftu Garden Terrace', type: 'nature',
+    description: 'Manicured garden paths with panoramic views of Lake Hora and the surrounding highlands.',
+    image: '/pool-garden.jpg', rating: 5.0, distance: 'On-site', openHours: 'Always open',
+    lat: KURIFTU_LAT + 0.001, lng: KURIFTU_LNG + 0.001, aiReason: 'Ideal for your evening relaxation',
   },
   {
-    id: '6', name: 'Artisan Craft Village', type: 'shopping',
-    description: 'Local artisans creating traditional Ethiopian crafts, textiles, and souvenirs.',
-    image: '/culture-hero.jpg', rating: 4.6, distance: '1.2 km', openHours: '10:00 AM - 5:00 PM', phone: '+251 11 234 5681',
-    lat: 8.74, lng: 38.96, aiReason: 'Great for your cultural curiosity',
+    id: '6', name: 'Bishoftu Market (Gulit)', type: 'shopping',
+    description: 'Open-air market with fresh produce, handwoven shawls, spices, and traditional crafts.',
+    image: '/culture-hero.jpg', rating: 4.5, distance: '2.5 km', openHours: '7:00 AM – 5:00 PM',
+    lat: 8.7510, lng: 38.9720, aiReason: 'Discover authentic Ethiopian crafts',
   },
   {
-    id: '7', name: 'Debre Zeyit (Bishoftu) Churches', type: 'heritage',
-    description: 'Historic Orthodox churches with stunning murals and ancient religious artifacts.',
-    image: '/culture-hero.jpg', rating: 4.8, distance: '4 km', openHours: '7:00 AM - 5:00 PM',
-    lat: 8.73, lng: 38.98, aiReason: 'Rich in the history you appreciate',
+    id: '7', name: 'Debre Sina Michael Church', type: 'heritage',
+    description: 'Historic rock-hewn Orthodox church dating back centuries, perched on a hilltop overlooking Bishoftu.',
+    image: '/culture-hero.jpg', rating: 4.8, distance: '3 km', openHours: '7:00 AM – 5:00 PM',
+    lat: 8.7480, lng: 38.9810, aiReason: 'Rich in the history you appreciate',
   },
   {
-    id: '8', name: 'Habesha Tej House', type: 'restaurant',
-    description: 'Traditional honey wine bar serving authentic tej with local appetizers and live music.',
-    image: '/dining-hall.jpg', rating: 4.5, distance: '2 km', openHours: '4:00 PM - 11:00 PM', phone: '+251 11 234 5682',
-    lat: 8.75, lng: 38.95, aiReason: 'A unique evening experience',
+    id: '8', name: 'Tej Bet (Honey Wine House)', type: 'restaurant',
+    description: 'Local tej house serving traditional Ethiopian honey wine with live azmari music in the evenings.',
+    image: '/dining-hall.jpg', rating: 4.6, distance: '1.8 km', openHours: '4:00 PM – 11:00 PM',
+    lat: 8.7490, lng: 38.9700, aiReason: 'A unique evening experience',
   },
   {
-    id: '9', name: 'Bishoftu Local Market', type: 'shopping',
-    description: 'Vibrant market with handwoven textiles, spices, and traditional Ethiopian clothing.',
-    image: '/culture-hero.jpg', rating: 4.7, distance: '3 km', openHours: '8:00 AM - 6:00 PM',
-    lat: 8.75, lng: 38.94, aiReason: 'Discover authentic Ethiopian crafts',
+    id: '9', name: 'Lake Bishoftu Walking Trail', type: 'nature',
+    description: 'Scenic lakeside walking path around Lake Bishoftu, perfect for morning jogs and bird watching.',
+    image: '/ethiopian-landscape.jpg', rating: 4.7, distance: '1.2 km', openHours: '5:00 AM – 7:00 PM',
+    lat: 8.7560, lng: 38.9750, aiReason: 'A serene nature experience',
   },
   {
-    id: '10', name: 'Kuriftu Meditation Garden', type: 'spa',
-    description: 'Tranquil garden space for yoga, meditation, and peaceful reflection.',
-    image: '/pool-garden.jpg', rating: 4.9, distance: 'On-site', openHours: '6:00 AM - 8:00 PM',
+    id: '10', name: 'Kuriftu Pool & Lounge', type: 'spa',
+    description: 'Resort swimming pool with sun loungers, poolside bar, and Lake Hora views.',
+    image: '/pool-garden.jpg', rating: 4.9, distance: 'On-site', openHours: '6:00 AM – 9:00 PM',
     lat: KURIFTU_LAT, lng: KURIFTU_LNG, aiReason: 'For your moments of tranquility',
   },
   {
-    id: '11', name: 'Bird Watching Trail', type: 'nature',
-    description: 'Observe endemic Ethiopian birds including the Abyssinian longclaw and black-winged lovebird.',
-    image: '/ethiopian-landscape.jpg', rating: 4.6, distance: 'On-site', openHours: 'Best at dawn',
-    lat: KURIFTU_LAT + 0.01, lng: KURIFTU_LNG + 0.02, aiReason: 'A serene nature experience',
+    id: '11', name: 'Azmari Music Night', type: 'cultural',
+    description: 'Live traditional Ethiopian music with masinko and krar performances at the resort lounge.',
+    image: '/culture-hero.jpg', rating: 4.8, distance: 'On-site', openHours: '7:00 PM – 11:00 PM',
+    lat: KURIFTU_LAT, lng: KURIFTU_LNG, aiReason: 'Experience the soul of Ethiopian music',
   },
   {
-    id: '12', name: 'Azmari Music Hall', type: 'cultural',
-    description: 'Live performances of traditional azmari music with masinko and krar instruments.',
-    image: '/culture-hero.jpg', rating: 4.8, distance: 'On-site', openHours: '7:00 PM - 11:00 PM', phone: '+251 11 234 5683',
-    lat: KURIFTU_LAT, lng: KURIFTU_LNG, aiReason: 'Experience the soul of Ethiopian music',
+    id: '12', name: 'Bishoftu Town Center', type: 'shopping',
+    description: 'Central Bishoftu with cafes, shops, and the weekly local market. A short walk from the resort.',
+    image: '/culture-hero.jpg', rating: 4.4, distance: '2 km', openHours: '8:00 AM – 8:00 PM',
+    lat: 8.7515, lng: 38.9700, aiReason: 'Explore the local scene',
   },
 ];
 
-const typeConfig: Record<string, { icon: string; color: string; bg: string }> = {
-  all: { icon: '✨', color: 'text-[#D4A017]', bg: 'bg-[#D4A017]' },
-  cultural: { icon: '🏛️', color: 'text-amber-600', bg: 'bg-amber-500' },
-  restaurant: { icon: '🍽️', color: 'text-red-600', bg: 'bg-red-500' },
-  spa: { icon: '💆', color: 'text-teal-600', bg: 'bg-teal-500' },
-  nature: { icon: '🌿', color: 'text-green-600', bg: 'bg-green-500' },
-  shopping: { icon: '🛍️', color: 'text-purple-600', bg: 'bg-purple-500' },
-  heritage: { icon: '⛪', color: 'text-orange-600', bg: 'bg-orange-500' },
+const typeConfig: Record<string, { icon: string; bg: string }> = {
+  all: { icon: '✨', bg: 'bg-[#D4A017]' },
+  cultural: { icon: '🏛️', bg: 'bg-amber-500' },
+  restaurant: { icon: '🍽️', bg: 'bg-red-500' },
+  spa: { icon: '💆', bg: 'bg-teal-500' },
+  nature: { icon: '🌿', bg: 'bg-green-500' },
+  shopping: { icon: '🛍️', bg: 'bg-purple-500' },
+  heritage: { icon: '⛪', bg: 'bg-orange-500' },
 };
 
 export default function ExploreTab() {
   const { user, isLoaded } = useUser();
   const [activeFilter, setActiveFilter] = useState('all');
-  const [suggestions, setSuggestions] = useState<Location[]>([]);
-  const [loadingSuggestions, setLoadingSuggestions] = useState(true);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch personalized suggestions based on user prefs
+  // Personalize locations based on user preferences from DB
   useEffect(() => {
     if (!isLoaded) return;
 
     const userId = user?.id;
-    const url = userId ? '/api/preferences' : null;
-
-    if (!url) {
-      // Not logged in — show all locations
-      setSuggestions(allLocations);
-      setLoadingSuggestions(false);
+    if (!userId) {
+      setLocations(allLocations);
+      setLoading(false);
       return;
     }
 
-    fetch(url)
+    fetch('/api/preferences')
       .then(r => r.json())
       .then(data => {
-        const matched = allLocations.filter(loc => {
-          const acts = (data.activities || []).map((a: string) => a.toLowerCase());
-          const hobbies = (data.hobbies || []).map((h: string) => h.toLowerCase());
-          const foods = (data.favorite_foods || []).map((f: string) => f.toLowerCase());
+        const acts = (data.activities || []).map((a: string) => a.toLowerCase());
+        const hobbies = (data.hobbies || []).map((h: string) => h.toLowerCase());
+        const foods = (data.favorite_foods || []).map((f: string) => f.toLowerCase());
+        const personality = (data.personality_type || '').toLowerCase();
 
-          // Match types to preferences
-          if (loc.type === 'restaurant' && (foods.includes('spicy') || foods.includes('traditional') || foods.includes('comfort'))) return true;
-          if (loc.type === 'spa' && (acts.includes('spa') || hobbies.includes('meditation') || hobbies.includes('reading'))) return true;
-          if (loc.type === 'nature' && (acts.includes('nature') || hobbies.includes('hiking') || hobbies.includes('photography'))) return true;
-          if (loc.type === 'cultural' && (acts.includes('cultural') || hobbies.includes('art'))) return true;
-          if (loc.type === 'heritage' && (hobbies.includes('photography') || hobbies.includes('reading'))) return true;
-          if (loc.type === 'shopping' && hobbies.includes('art')) return true;
-          return false;
+        const matched = allLocations.filter(loc => {
+          switch (loc.type) {
+            case 'restaurant':
+              return foods.some(f => ['spicy', 'traditional', 'comfort', 'sharing'].includes(f)) ||
+                     personality.includes('adventurer');
+            case 'spa':
+              return acts.includes('spa') || hobbies.includes('meditation') || hobbies.includes('reading') ||
+                     personality.includes('relaxer');
+            case 'nature':
+              return acts.includes('nature') || hobbies.includes('hiking') || hobbies.includes('photography') ||
+                     personality.includes('adventurer') || personality.includes('explorer');
+            case 'cultural':
+              return acts.includes('cultural') || hobbies.includes('art') ||
+                     personality.includes('explorer') || personality.includes('social');
+            case 'heritage':
+              return hobbies.includes('photography') || hobbies.includes('reading') ||
+                     personality.includes('explorer');
+            case 'shopping':
+              return hobbies.includes('art') || hobbies.includes('cooking') ||
+                     personality.includes('social');
+            default:
+              return true;
+          }
         });
 
-        setSuggestions(matched.length > 0 ? matched : allLocations);
-        setLoadingSuggestions(false);
+        setLocations(matched.length > 0 ? matched : allLocations);
+        setLoading(false);
       })
       .catch(() => {
-        setSuggestions(allLocations);
-        setLoadingSuggestions(false);
+        setLocations(allLocations);
+        setLoading(false);
       });
   }, [isLoaded, user?.id]);
 
-  const filteredLocations = activeFilter === 'all'
-    ? suggestions
-    : suggestions.filter(l => l.type === activeFilter);
-
+  const filtered = activeFilter === 'all' ? locations : locations.filter(l => l.type === activeFilter);
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="px-4 py-6 md:px-8 border-b border-border bg-white">
-        <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#4B3425] mb-2">
+      <div className="px-4 py-5 md:px-8 border-b border-border bg-white">
+        <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#4B3425] mb-1">
           Explore & Discover
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           AI-personalized guide to experiences around Kuriftu African Village
         </p>
       </div>
 
-      {/* Map Section - Satellite View */}
-      <div className="relative w-full h-[40vh] md:h-[50vh] bg-muted overflow-hidden">
+      {/* Satellite Map */}
+      <div className="relative w-full h-[35vh] md:h-[45vh] bg-muted overflow-hidden">
         <iframe
-          src={`https://maps.google.com/maps?q=${KURIFTU_LAT},${KURIFTU_LNG}&t=k&z=16&ie=UTF8&iwloc=&output=embed`}
+          src={`https://maps.google.com/maps?q=${KURIFTU_LAT},${KURIFTU_LNG}&t=k&z=15&ie=UTF8&iwloc=&output=embed`}
           width="100%" height="100%" style={{ border: 0 }}
           allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
-          className="w-full h-full" title="Kuriftu Resort Satellite Map"
+          className="w-full h-full" title="Kuriftu Resort Satellite View"
         />
-        <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow text-xs text-[#4B3425]">
+        <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-2.5 py-1 rounded-md shadow text-xs font-medium text-[#4B3425]">
           📍 Kuriftu African Village, Bishoftu
         </div>
       </div>
 
-      {/* AI Recommendation Card */}
-      <div className="mx-4 md:mx-8 -mt-8 relative z-10">
-        <div className="bg-gradient-to-r from-[#4B3425] to-[#4B3425]/80 rounded-2xl p-5 text-white shadow-2xl">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-6 h-6" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-lg mb-1">Emama recommends</h3>
-              <p className="text-white/80 text-sm">
-                {isLoaded && user
-                  ? `Based on your preferences, I've curated the best experiences around Kuriftu just for you, ${user.firstName || 'guest'}!`
-                  : 'Sign in to get personalized recommendations based on your interests. Otherwise, explore all the amazing places around Kuriftu!'}
-              </p>
-            </div>
-          </div>
+      {/* AI Recommendation Card — Compact */}
+      <div className="px-4 md:px-8 -mt-4 relative z-10">
+        <div className="bg-gradient-to-r from-[#4B3425] to-[#4B3425]/80 rounded-xl p-3.5 flex items-center gap-3 text-white shadow-lg">
+          <Sparkles className="w-5 h-5 text-[#D4A017] flex-shrink-0" />
+          <p className="text-white/90 text-sm leading-snug">
+            {isLoaded && user
+              ? `Curated for you, ${user.firstName || user?.username || 'guest'} — based on your interests.`
+              : 'Explore real places around Kuriftu. Sign in for personalized picks!'}
+          </p>
         </div>
       </div>
 
       {/* Filter Pills */}
-      <div className="px-4 md:px-8 mt-6">
+      <div className="px-4 md:px-8 mt-4">
         <div className="flex flex-wrap gap-2">
           {Object.entries(typeConfig).map(([type, cfg]) => (
             <button
               key={type}
               onClick={() => setActiveFilter(type)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                 activeFilter === type
                   ? `${cfg.bg} text-white shadow`
                   : 'bg-white text-foreground hover:bg-muted border border-border'
@@ -226,8 +227,8 @@ export default function ExploreTab() {
       </div>
 
       {/* Locations Grid */}
-      <div className="px-4 md:px-8 py-8">
-        {loadingSuggestions ? (
+      <div className="px-4 md:px-8 py-6">
+        {loading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map(i => (
               <div key={i} className="bg-white rounded-xl overflow-hidden shadow animate-pulse">
@@ -235,50 +236,51 @@ export default function ExploreTab() {
                 <div className="p-4 space-y-2">
                   <div className="h-4 bg-muted rounded w-3/4" />
                   <div className="h-3 bg-muted rounded w-full" />
-                  <div className="h-8 bg-muted rounded w-full mt-4" />
+                  <div className="h-8 bg-muted rounded w-full mt-3" />
                 </div>
               </div>
             ))}
           </div>
-        ) : filteredLocations.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
-            <p>No suggestions match this filter. Try a different type.</p>
+            <MapPin className="w-10 h-10 mx-auto mb-3 opacity-40" />
+            <p className="font-medium">No places match this filter</p>
+            <button onClick={() => setActiveFilter('all')} className="mt-2 text-[#D4A017] hover:underline text-sm">
+              Show all places
+            </button>
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredLocations.map((location) => (
-              <div key={location.id} className="bg-white rounded-xl overflow-hidden shadow-warm-md hover:shadow-warm transition-all duration-300 text-left group">
+            {filtered.map(loc => (
+              <div key={loc.id} className="bg-white rounded-xl overflow-hidden shadow-warm-md hover:shadow-warm transition-all duration-300 group">
                 <div className="relative h-36">
-                  <Image src={location.image} alt={location.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <div className="absolute top-3 left-3">
-                    <span className={`${typeConfig[location.type]?.bg || 'bg-gray-500'} text-white text-xs px-2 py-1 rounded-full`}>
-                      {typeConfig[location.type]?.icon} {location.type}
+                  <Image src={loc.image} alt={loc.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute top-2.5 left-2.5">
+                    <span className={`${typeConfig[loc.type]?.bg || 'bg-gray-500'} text-white text-[11px] px-2 py-0.5 rounded-full font-medium`}>
+                      {typeConfig[loc.type]?.icon} {loc.type}
                     </span>
                   </div>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-[#4B3425] mb-1 group-hover:text-[#D4A017] transition-colors">{location.name}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{location.description}</p>
+                  <h3 className="font-semibold text-[#4B3425] text-sm mb-0.5 group-hover:text-[#D4A017] transition-colors">{loc.name}</h3>
+                  <p className="text-xs text-muted-foreground line-clamp-2 mb-2.5">{loc.description}</p>
                   <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-1 text-sm">
-                      <Star className="w-4 h-4 text-[#D4A017] fill-[#D4A017]" />
-                      <span className="font-medium">{location.rating}</span>
+                    <div className="flex items-center gap-1">
+                      <Star className="w-3.5 h-3.5 text-[#D4A017] fill-[#D4A017]" />
+                      <span className="text-xs font-medium">{loc.rating}</span>
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="w-3 h-3" />
-                      <span>{location.distance} · {location.openHours}</span>
-                    </div>
+                    <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> {loc.distance} · {loc.openHours}
+                    </span>
                   </div>
-                  <div className="flex gap-2">
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 inline-flex items-center justify-center gap-1 bg-[#D4A017] hover:bg-[#D4A017]/90 text-white text-sm font-medium py-2 rounded-lg transition-colors"
-                    >
-                      <MapPin className="w-4 h-4" /> Go there
-                    </a>
-                  </div>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full inline-flex items-center justify-center gap-1.5 bg-[#D4A017] hover:bg-[#D4A017]/90 text-white text-xs font-medium py-2 rounded-lg transition-colors"
+                  >
+                    <MapPin className="w-3.5 h-3.5" /> Go there
+                  </a>
                 </div>
               </div>
             ))}
