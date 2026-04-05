@@ -253,13 +253,13 @@ export default function MyScheduleTab() {
             </div>
 
             {/* Learn More Link */}
-            <div className="bg-primary/5 rounded-xl p-5 border border-primary/20 flex items-center justify-between group cursor-pointer hover:bg-primary/10 transition-smooth">
+            <Link href="/little-ethiopia" className="bg-primary/5 rounded-xl p-5 border border-primary/20 flex items-center justify-between group cursor-pointer hover:bg-primary/10 transition-smooth">
               <div>
                 <p className="text-sm font-semibold text-primary mb-1">Want to learn more?</p>
                 <p className="text-xs text-muted-foreground">Explore traditions & cultural context</p>
               </div>
               <ChevronRight className="w-5 h-5 text-primary group-hover:translate-x-1 transition-transform" />
-            </div>
+            </Link>
 
             {/* Close */}
             <button
