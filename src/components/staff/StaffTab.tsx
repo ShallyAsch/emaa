@@ -9,23 +9,33 @@ interface ServiceRequest {
   request_type: string;
   status: string;
   created_at: string;
-  first_name: string | null;
+  fulfilled_at: string | null;
+  first_name: string;
   email: string | null;
 }
 
 export default function StaffTab() {
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'pending' | 'fulfilled'>('all');
 
   const fetchRequests = () => {
     fetch('/api/staff')
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error(`API error: ${r.status}`);
+        return r.json();
+      })
       .then(data => {
         if (Array.isArray(data)) setRequests(data);
+        else setError('Unexpected response');
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(err => {
+        console.error('Staff fetch error:', err);
+        setError(err.message);
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -60,6 +70,18 @@ export default function StaffTab() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-muted-foreground">Loading requests...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <p className="text-red-600 font-semibold mb-2">Error: {error}</p>
+          <p className="text-muted-foreground text-sm">Make sure you're signed in and restart the dev server.</p>
+          <button onClick={fetchRequests} className="mt-4 bg-[#D4A017] text-white px-4 py-2 rounded-lg">Retry</button>
+        </div>
       </div>
     );
   }

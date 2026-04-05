@@ -254,16 +254,28 @@ export async function getScheduleProgress(clerk_id: string) {
 
 export async function createServiceRequest(clerk_id: string, request_type: string) {
   const database = getDb();
-  await database.execute({
-    sql: 'INSERT INTO service_requests (clerk_id, request_type) VALUES (?, ?)',
-    args: [clerk_id, request_type],
-  });
+  // Ensure table exists (in case initDb ran before table was added)
+  try {
+    await database.execute(`INSERT INTO service_requests (clerk_id, request_type) VALUES (?, ?)`, [clerk_id, request_type]);
+  } catch {
+    // Table might not exist, create it and retry
+    await database.execute(`CREATE TABLE IF NOT EXISTS service_requests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      clerk_id TEXT NOT NULL,
+      request_type TEXT NOT NULL,
+      status TEXT DEFAULT 'pending',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      fulfilled_at DATETIME
+    )`);
+    await database.execute(`INSERT INTO service_requests (clerk_id, request_type) VALUES (?, ?)`, [clerk_id, request_type]);
+  }
 }
 
 export async function getServiceRequests() {
   const database = getDb();
   const result = await database.execute({
-    sql: `SELECT sr.*, u.first_name, u.email
+    sql: `SELECT sr.id, sr.clerk_id, sr.request_type, sr.status, sr.created_at, sr.fulfilled_at,
+          COALESCE(u.first_name, 'Guest') as first_name, u.email
           FROM service_requests sr
           LEFT JOIN users u ON sr.clerk_id = u.clerk_id
           ORDER BY sr.created_at DESC`,
@@ -275,7 +287,8 @@ export async function getServiceRequests() {
     request_type: row.request_type as string,
     status: row.status as string,
     created_at: row.created_at as string,
-    first_name: row.first_name as string | null,
+    fulfilled_at: row.fulfilled_at as string | null,
+    first_name: row.first_name as string,
     email: row.email as string | null,
   }));
 }

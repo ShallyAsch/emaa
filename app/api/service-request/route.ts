@@ -17,8 +17,10 @@ export async function POST(req: Request) {
     const { type } = await req.json();
     const label = serviceLabels[type] || type;
     await createServiceRequest(userId, label);
+    console.log(`[service-request] Created: ${label} for ${userId}`);
     return NextResponse.json({ success: true, message: `${label} requested` });
   } catch (err) {
+    console.error('[service-request] Error:', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

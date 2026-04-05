@@ -3,14 +3,15 @@ import { NextResponse } from 'next/server';
 import { getServiceRequests, fulfillServiceRequest } from '@/src/lib/db';
 
 export async function GET() {
-  // In production, check if user has staff role
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const requests = await getServiceRequests();
+    console.log('[staff] Returning', requests.length, 'requests');
     return NextResponse.json(requests);
   } catch (err) {
+    console.error('[staff] GET error:', err);
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }
