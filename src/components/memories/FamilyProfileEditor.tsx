@@ -12,12 +12,14 @@ interface FamilyProfileEditorProps {
   };
   onClose: () => void;
   onSave?: (profile: any) => void;
+  guestId?: string;
 }
 
 export default function FamilyProfileEditor({
   profile,
   onClose,
   onSave,
+  guestId,
 }: FamilyProfileEditorProps) {
   const [formData, setFormData] = useState(profile);
   const [saving, setSaving] = useState(false);
@@ -30,7 +32,8 @@ export default function FamilyProfileEditor({
     e.preventDefault();
     setSaving(true);
     try {
-      const res = await fetch('/api/family-profile', {
+      const url = guestId ? `/api/family-profile?guestId=${guestId}` : '/api/family-profile';
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

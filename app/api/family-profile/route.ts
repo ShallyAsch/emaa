@@ -10,12 +10,17 @@ const defaultProfile = {
   special_moments: [],
 };
 
-export async function GET() {
+export async function GET(req: Request) {
   const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // Use userId if authenticated, or URL param for guest
+  const url = new URL(req.url);
+  const guestId = url.searchParams.get('guestId');
+  const clerkId = userId || (guestId ? `guest-${guestId}` : null);
+
+  if (!clerkId) return NextResponse.json({ error: 'No identifier' }, { status: 400 });
 
   try {
-    const profile = await getFamilyProfile(userId);
+    const profile = await getFamilyProfile(clerkId);
     return NextResponse.json(profile || defaultProfile);
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
@@ -24,11 +29,15 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const url = new URL(req.url);
+  const guestId = url.searchParams.get('guestId');
+  const clerkId = userId || (guestId ? `guest-${guestId}` : null);
+
+  if (!clerkId) return NextResponse.json({ error: 'No identifier' }, { status: 400 });
 
   try {
     const body = await req.json();
-    await saveFamilyProfile(userId, {
+    await saveFamilyProfile(clerkId, {
       coffee_preference: body.coffeePreference,
       dietary_notes: body.dietaryNotes,
       favorite_seating: body.favoriteSeating,

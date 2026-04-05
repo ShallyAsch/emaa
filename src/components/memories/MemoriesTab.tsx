@@ -26,8 +26,12 @@ export default function MemoriesTab() {
 
   // Fetch family profile from DB
   useEffect(() => {
-    if (!isLoaded || !user) return;
-    fetch('/api/family-profile')
+    if (!isLoaded) return;
+
+    const guestId = user?.id || `guest-${Date.now()}`;
+    const url = user ? '' : `?guestId=${guestId}`;
+
+    fetch(`/api/family-profile${url}`)
       .then(r => r.json())
       .then(data => {
         setProfile({
@@ -119,6 +123,7 @@ export default function MemoriesTab() {
               }}
               onClose={() => setShowProfileEditor(false)}
               onSave={(updated) => setProfile(updated)}
+              guestId={!user ? `guest-${Date.now()}` : undefined}
             />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
