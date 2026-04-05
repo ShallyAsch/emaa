@@ -40,7 +40,7 @@ const mockEvents: Event[] = [
     time: '8:00 PM',
     description: 'Traditional performances',
     color: 'bg-rose-100',
-    image: '/images.jpg',
+    image: '/culture-hero.jpg',
     link: '/events',
   },
   {
@@ -49,7 +49,7 @@ const mockEvents: Event[] = [
     time: '2:00 PM',
     description: 'Relaxation & wellness',
     color: 'bg-green-100',
-    image: '/images.jpg',
+    image: '/spa-wellness.jpg',
     link: '/comfort',
   },
 ];
