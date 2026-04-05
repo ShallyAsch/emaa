@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
 import { Heart, Eye, EyeOff, Sparkles, Calendar, Users, MessageCircle, ChevronRight, X, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -41,7 +40,7 @@ interface GroupActivity {
 const currentGuests: Guest[] = [
   {
     id: '1',
-    name: 'Guest',
+    name: 'Selam',
     location: 'Addis Ababa',
     interests: ['Coffee', 'Traditional Games', 'Music'],
     avatar: '/guest-1.jpg',
@@ -77,7 +76,7 @@ const currentGuests: Guest[] = [
   },
   {
     id: '5',
-    name: 'Ayana',
+    name: 'Selam',
     location: 'Dire Dawa',
     interests: ['Music', 'Dance', 'Coffee'],
     avatar: '/guest-1.jpg',
@@ -261,6 +260,11 @@ export default function CommunityTab() {
   const [showJoinPopup, setShowJoinPopup] = useState<GroupActivity | null>(null);
   const [showIntroducePopup, setShowIntroducePopup] = useState(false);
   const [invitedGuests, setInvitedGuests] = useState<Set<string>>(new Set());
+  const [scheduleAdded, setScheduleAdded] = useState(false);
+  const [introduceStep, setIntroduceStep] = useState<'select' | 'intro' | 'confirmed'>('select');
+  const [selectedGuestForIntro, setSelectedGuestForIntro] = useState<Guest | null>(null);
+  const [showAllActivities, setShowAllActivities] = useState(false);
+  const activitiesSectionRef = React.useRef<HTMLDivElement>(null);
 
   const toggleLike = (momentId: string) => {
     setLikedMoments((prev) =>
@@ -350,31 +354,65 @@ export default function CommunityTab() {
       {/* AI Match Suggestion */}
       {showEmamaMessage && sharedInterestGuests.length > 0 && (
         <div className="px-4 md:px-8 mt-6">
-          <div className="bg-gradient-to-r from-accent/20 to-accent/10 border border-accent/30 rounded-2xl p-5">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center flex-shrink-0">
-                <Sparkles className="w-6 h-6 text-accent-foreground" />
+          <div className="bg-gradient-to-r from-accent/15 to-accent/8 border border-accent/25 rounded-xl p-4 max-w-2xl">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-5 h-5 text-accent" />
               </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-foreground mb-1">Emama Zinashe noticed something</h3>
-                <p className="text-muted-foreground text-sm mb-3">
-                  You and {sharedInterestGuests.length} other guests both love traditional games — 
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-foreground text-sm mb-0.5">Emama Zinashe noticed something</h3>
+                <p className="text-muted-foreground text-xs leading-relaxed mb-3">
+                  You and {sharedInterestGuests.length} other guests both love traditional games —
                   would you like to join a Gebeta game at 4 PM today?
                 </p>
-                <div className="flex gap-3">
-                  <Link href="/schedule">
-                    <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                      Yes, add to schedule
-                      <ChevronRight className="w-4 h-4 ml-1" />
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    onClick={() => setShowEmamaMessage(false)}
-                    className="text-muted-foreground hover:bg-accent/10"
-                  >
-                    Maybe later
-                  </Button>
+                <div className="flex gap-2">
+                  {!scheduleAdded ? (
+                    <>
+                      <Button
+                        onClick={() => {
+                          const bookedEvent = {
+                            id: `ai-suggestion-${Date.now()}`,
+                            title: 'Gebeta Game Session (AI Suggested)',
+                            date: new Date().toISOString().split('T')[0],
+                            time: '4:00 PM',
+                            description: 'Traditional Ethiopian board game session - suggested by Emama Zinashe based on shared interests',
+                            type: 'community',
+                            image: '/culture-hero.jpg',
+                          };
+                          const existing = JSON.parse(localStorage.getItem('bookedEvents') || '[]');
+                          if (!existing.find((e: { id: string }) => e.id === bookedEvent.id)) {
+                            localStorage.setItem('bookedEvents', JSON.stringify([...existing, bookedEvent]));
+                          }
+                          setScheduleAdded(true);
+                        }}
+                        className="bg-accent hover:bg-accent/90 text-accent-foreground text-xs h-8 px-3"
+                      >
+                        Yes, add to schedule
+                        <ChevronRight className="w-3 h-3 ml-1" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => setShowEmamaMessage(false)}
+                        className="text-muted-foreground hover:bg-accent/10 text-xs h-8"
+                      >
+                        Maybe later
+                      </Button>
+                    </>
+                  ) : (
+                    <div className="flex items-center gap-2 text-green-600 text-xs font-medium py-1">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Added to your schedule
+                      <Button
+                        variant="ghost"
+                        onClick={() => setShowEmamaMessage(false)}
+                        className="text-muted-foreground hover:bg-accent/10 text-xs h-6 ml-2"
+                      >
+                        Dismiss
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -493,7 +531,7 @@ export default function CommunityTab() {
       </section>
 
       {/* Join the Circle */}
-      <section className="px-4 md:px-8 py-8 bg-primary/5">
+      <section ref={activitiesSectionRef} className="px-4 md:px-8 py-8 bg-primary/5">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="font-serif text-xl font-bold text-primary flex items-center gap-2">
@@ -502,16 +540,26 @@ export default function CommunityTab() {
             </h2>
             <p className="text-sm text-muted-foreground">Activities happening soon</p>
           </div>
-          <Link href="/schedule">
-            <Button variant="ghost" className="text-accent text-sm">
-              View all
-              <ChevronRight className="w-4 h-4 ml-1" />
-            </Button>
-          </Link>
+          <button
+            onClick={() => {
+              if (!showAllActivities) {
+                setShowAllActivities(true);
+                setTimeout(() => {
+                  activitiesSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 50);
+              } else {
+                window.location.href = '/schedule';
+              }
+            }}
+            className="text-accent text-sm font-medium hover:text-accent/80 flex items-center gap-1 transition-colors"
+          >
+            {showAllActivities ? 'View schedule' : 'View all'}
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          {groupActivities.map((activity) => (
+          {(showAllActivities ? groupActivities : groupActivities.slice(0, 2)).map((activity) => (
             <div
               key={activity.id}
               className="bg-white rounded-2xl overflow-hidden shadow-warm-md hover:shadow-warm transition-all duration-300"
@@ -629,7 +677,11 @@ export default function CommunityTab() {
             {/* Header */}
             <div className="bg-primary text-primary-foreground p-6 rounded-t-3xl relative">
               <button
-                onClick={() => setShowIntroducePopup(false)}
+                onClick={() => {
+                  setShowIntroducePopup(false);
+                  setIntroduceStep('select');
+                  setSelectedGuestForIntro(null);
+                }}
                 className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-smooth"
                 aria-label="Close"
               >
@@ -637,79 +689,190 @@ export default function CommunityTab() {
               </button>
               <div className="flex items-center gap-3 mb-2">
                 <Sparkles className="w-6 h-6 text-accent" />
-                <h2 className="font-serif text-xl font-bold">Personality Matches</h2>
+                <h2 className="font-serif text-xl font-bold">
+                  {introduceStep === 'select' && 'Who would you like to meet?'}
+                  {introduceStep === 'intro' && 'Your Introduction'}
+                  {introduceStep === 'confirmed' && 'Introduction Sent!'}
+                </h2>
               </div>
               <p className="text-primary-foreground/80 text-sm">
-                Emama found guests who share your interests and personality
+                {introduceStep === 'select' && 'Guests who share your interests and vibe'}
+                {introduceStep === 'intro' && 'Emama has crafted a personal introduction'}
+                {introduceStep === 'confirmed' && 'We will connect you both soon'}
               </p>
             </div>
 
-            {/* Matches List */}
-            <div className="p-6 space-y-4">
-              {guests.filter(g => g.id === '1' || g.id === '5' || g.id === '9').map((guest) => (
-                <div
-                  key={guest.id}
-                  className="bg-muted/30 rounded-2xl p-4 border border-border"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
-                      <Image
-                        src={guest.avatar}
-                        alt={guest.name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-foreground">{guest.name}</h3>
-                      <p className="text-xs text-muted-foreground mb-2">{guest.location}</p>
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {guest.interests.map((interest) => (
-                          <span
-                            key={interest}
-                            className="text-xs bg-accent/10 text-accent px-2 py-0.5 rounded-full"
-                          >
-                            {interest}
-                          </span>
-                        ))}
+            {/* Content */}
+            <div className="p-6">
+              {introduceStep === 'select' && (
+                <div className="space-y-4">
+                  {sharedInterestGuests.map((guest) => {
+                    const sharedInterests = guest.interests.filter((i) =>
+                      guests[0].interests.includes(i)
+                    );
+                    return (
+                      <div
+                        key={guest.id}
+                        className="bg-muted/30 rounded-2xl p-4 border border-border hover:border-accent/40 transition-all cursor-pointer group"
+                        onClick={() => {
+                          setSelectedGuestForIntro(guest);
+                          setIntroduceStep('intro');
+                        }}
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="relative w-14 h-14 rounded-full overflow-hidden flex-shrink-0">
+                            <Image
+                              src={guest.avatar}
+                              alt={guest.name}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-foreground group-hover:text-accent transition-colors">
+                              {guest.name}
+                            </h3>
+                            <p className="text-xs text-muted-foreground mb-2">{guest.location}</p>
+                            <div className="flex flex-wrap gap-1 mb-2">
+                              {sharedInterests.map((interest) => (
+                                <span
+                                  key={interest}
+                                  className="text-xs bg-accent/15 text-accent px-2 py-0.5 rounded-full font-medium"
+                                >
+                                  {interest}
+                                </span>
+                              ))}
+                            </div>
+                            <p className="text-xs text-foreground/60 italic">
+                              &quot;{guest.personality}&quot;
+                            </p>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors flex-shrink-0 mt-6" />
+                        </div>
                       </div>
-                      <p className="text-sm text-foreground/70 italic mb-3">
-                        &quot;{guest.personality}&quot;
-                      </p>
-                      <div className="bg-secondary/10 rounded-lg p-3 mb-3">
-                        <p className="text-xs text-secondary font-medium mb-1">Why you match:</p>
-                        <p className="text-xs text-foreground/70">
-                          You both love {guest.interests[0].toLowerCase()} and have similar warm, curious personalities. 
-                          Emama thinks you&apos;d have great conversations!
+                    );
+                  })}
+                </div>
+              )}
+
+              {introduceStep === 'intro' && selectedGuestForIntro && (
+                <div className="space-y-6">
+                  {/* Selected Guest Card */}
+                  <div className="bg-accent/10 rounded-2xl p-5 border border-accent/20">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="relative w-16 h-16 rounded-full overflow-hidden">
+                        <Image
+                          src={selectedGuestForIntro.avatar}
+                          alt={selectedGuestForIntro.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground text-lg">{selectedGuestForIntro.name}</h3>
+                        <p className="text-sm text-muted-foreground">{selectedGuestForIntro.location}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {selectedGuestForIntro.interests.map((interest) => (
+                        <span
+                          key={interest}
+                          className="text-xs bg-accent/20 text-accent px-2.5 py-1 rounded-full"
+                        >
+                          {interest}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-sm text-foreground/70 italic">
+                      &quot;{selectedGuestForIntro.personality}&quot;
+                    </p>
+                  </div>
+
+                  {/* Introduction Message */}
+                  <div className="bg-primary/5 rounded-xl p-4 border border-primary/10">
+                    <div className="flex items-start gap-3 mb-3">
+                      <Sparkles className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="font-semibold text-primary text-sm mb-1">Emama&apos;s Introduction</h4>
+                        <p className="text-xs text-foreground/70 leading-relaxed">
+                          &quot;Hi {selectedGuestForIntro.name}, I thought you might enjoy meeting {currentUserName}. 
+                          You both share a love for {selectedGuestForIntro.interests.slice(0, 2).join(' and ')}, and 
+                          I think you&apos;d have wonderful conversations together. Would you be open to connecting?&quot;
                         </p>
                       </div>
-                      <Button
-                        onClick={() => handleInvite(guest.id)}
-                        disabled={invitedGuests.has(guest.id)}
-                        className={`w-full ${
-                          invitedGuests.has(guest.id)
-                            ? 'bg-green-600 hover:bg-green-700 text-white'
-                            : 'bg-accent hover:bg-accent/90 text-primary'
-                        }`}
-                        size="sm"
-                      >
-                        {invitedGuests.has(guest.id) ? (
-                          'Invitation Sent'
-                        ) : (
-                          <>
-                            <UserPlus className="w-4 h-4 mr-2" />
-                            Invite to Connect
-                          </>
-                        )}
-                      </Button>
                     </div>
                   </div>
-                </div>
-              ))}
 
-              <p className="text-center text-xs text-muted-foreground">
-                Emama will facilitate introductions at a comfortable time
-              </p>
+                  {/* Actions */}
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => {
+                        handleInvite(selectedGuestForIntro.id);
+                        setIntroduceStep('confirmed');
+                      }}
+                      disabled={invitedGuests.has(selectedGuestForIntro.id)}
+                      className={`w-full font-semibold py-3 rounded-xl transition-smooth ${
+                        invitedGuests.has(selectedGuestForIntro.id)
+                          ? 'bg-green-600 text-white cursor-default'
+                          : 'bg-accent hover:bg-accent/90 text-accent-foreground active:scale-[0.97]'
+                      }`}
+                    >
+                      {invitedGuests.has(selectedGuestForIntro.id) ? (
+                        'Introduction Already Sent'
+                      ) : (
+                        <>
+                          <UserPlus className="w-4 h-4 inline mr-2 -mt-0.5" />
+                          Yes, introduce us
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIntroduceStep('select');
+                        setSelectedGuestForIntro(null);
+                      }}
+                      className="w-full text-muted-foreground hover:text-foreground font-medium py-2 text-sm transition-colors"
+                    >
+                      Choose someone else
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {introduceStep === 'confirmed' && selectedGuestForIntro && (
+                <div className="text-center py-8 space-y-6">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                    <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground text-lg mb-2">
+                      Introduction Requested!
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Emama will reach out to {selectedGuestForIntro.name} and facilitate a warm introduction. 
+                      You&apos;ll be notified once they&apos;re comfortable connecting.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowIntroducePopup(false);
+                      setIntroduceStep('select');
+                      setSelectedGuestForIntro(null);
+                    }}
+                    className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-8 py-2.5 rounded-xl transition-smooth active:scale-[0.97]"
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+
+              {introduceStep === 'select' && (
+                <p className="text-center text-xs text-muted-foreground mt-6">
+                  Emama will facilitate introductions at a comfortable time for everyone
+                </p>
+              )}
             </div>
           </div>
         </div>

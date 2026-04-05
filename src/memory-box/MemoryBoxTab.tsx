@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
 import {
@@ -280,10 +280,31 @@ export default function MemoryBoxTab() {
   const [newPersonAvatar, setNewPersonAvatar] = useState<string | null>(null);
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<EventAttended | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const personAvatarInputRef = useRef<HTMLInputElement>(null);
 
   const highlightedMemories = memories.filter((m) => m.isFavorited).slice(0, 4);
+
+  // Load peopleMet from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('peopleMet');
+      if (stored) {
+        const parsed = JSON.parse(stored) as PersonMet[];
+        if (parsed.length > 0) {
+          setPeopleMet(parsed);
+        }
+      }
+    } catch {
+      // Invalid data, use defaults
+    }
+  }, []);
+
+  // Save peopleMet to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('peopleMet', JSON.stringify(peopleMet));
+  }, [peopleMet]);
 
   const filteredMemories = memories.filter((m) => {
     if (activeFilter === 'all') return true;
@@ -785,7 +806,10 @@ export default function MemoryBoxTab() {
                     <p className="text-xs text-muted-foreground">{event.date}</p>
                     <h3 className="font-semibold text-primary">{event.name}</h3>
                     <p className="text-sm text-foreground/70 line-clamp-2">{event.description}</p>
-                    <button className="text-sm text-accent font-medium hover:underline flex items-center gap-1">
+                    <button
+                      onClick={() => setSelectedEvent(event)}
+                      className="text-sm text-accent font-medium hover:underline flex items-center gap-1 transition-colors"
+                    >
                       View Memory
                       <ChevronRight className="w-3 h-3" />
                     </button>
@@ -1112,6 +1136,88 @@ export default function MemoryBoxTab() {
           historicalContext={selectedMemory.culturalContext}
           closingNote="This moment is now part of your story with us."
         />
+      )}
+
+      {/* Event Memory Modal */}
+      {selectedEvent && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            {/* Header with Image */}
+            <div className="relative h-48 w-full">
+              <Image
+                src={selectedEvent.image}
+                alt={selectedEvent.name}
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              <button
+                onClick={() => setSelectedEvent(null)}
+                className="absolute top-4 right-4 p-2 bg-white/90 hover:bg-white rounded-full transition-smooth active:scale-[0.97]"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5 text-foreground" />
+              </button>
+              <div className="absolute bottom-4 left-6 right-6">
+                <p className="text-white/70 text-xs mb-1">{selectedEvent.date}</p>
+                <h2 className="font-serif text-2xl font-bold text-white">{selectedEvent.name}</h2>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-5">
+              <div>
+                <p className="text-foreground/80 leading-relaxed">{selectedEvent.description}</p>
+              </div>
+
+              {/* AI Memory Note */}
+              <div className="bg-accent/10 rounded-xl p-4 border border-accent/20">
+                <div className="flex items-start gap-3 mb-2">
+                  <Sparkles className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-semibold text-primary text-sm mb-1">Emama&apos;s Note</h4>
+                    <p className="text-xs text-foreground/70 leading-relaxed italic">
+                      &quot;You experienced {selectedEvent.name.toLowerCase()} on {selectedEvent.date}. 
+                      It was one of those moments that reminds you why we do what we do — bringing people together 
+                      through authentic cultural experiences. We hope this memory stays with you always.&quot;
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    // Convert to a regular memory
+                    const newMemory: Memory = {
+                      id: `event-${selectedEvent.id}-${Date.now()}`,
+                      type: 'photo',
+                      title: selectedEvent.name,
+                      caption: selectedEvent.description,
+                      date: selectedEvent.date,
+                      image: selectedEvent.image,
+                      isCultural: true,
+                      culturalContext: `Attended ${selectedEvent.name} on ${selectedEvent.date}`,
+                      isFavorited: false,
+                    };
+                    setMemories((prev) => [newMemory, ...prev]);
+                    setSelectedEvent(null);
+                  }}
+                  className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold py-3 rounded-xl transition-smooth active:scale-[0.97]"
+                >
+                  Save to Memory Gallery
+                </button>
+                <button
+                  onClick={() => setSelectedEvent(null)}
+                  className="px-6 py-3 border border-border hover:bg-muted rounded-xl font-medium transition-smooth active:scale-[0.97]"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
