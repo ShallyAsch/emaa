@@ -3,9 +3,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, AlertCircle, Sun, Moon, Sunset, Lightbulb, User } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { analyzeMoodAndIntent, EmamaAnalysis } from '@/src/lib/aiAnalysis';
 
 type LightingMode = 'day' | 'night' | 'ambient';
+
+interface EmamaSuggestion {
+  icon: string;
+  label: string;
+  action: string;
+}
+
+interface EmamaAnalysis {
+  transcript: string;
+  mood: string;
+  message: string;
+  suggestions: EmamaSuggestion[];
+}
 
 interface LightingOption {
   mode: LightingMode;
@@ -76,19 +88,25 @@ export default function ComfortTab() {
           const transcript = event.results[0][0].transcript;
           setIsListening(false);
           setIsProcessing(true);
-          
+
           try {
-            // Call our newly added Gemini backend
-            const result = await analyzeMoodAndIntent(
-              transcript,
-              { ...mockGuest.preferences, roomTemperature: temperature, lightingPreference: lighting },
-              {
-                setTemperature,
-                setLighting: (l: string) => setLighting(l as LightingMode),
-                showToast: (title, description) => toast({ title, description })
-              }
-            );
+            const res = await fetch('/api/ai-chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ type: 'voice', message: transcript }),
+            });
+            const result = await res.json();
             setAnalysis(result);
+
+            // Auto-apply simple suggestions
+            result.suggestions?.forEach((s: EmamaSuggestion) => {
+              if (s.action.startsWith('temperature:')) {
+                setTemperature(parseInt(s.action.split(':')[1]));
+              }
+              if (s.action.startsWith('lighting:')) {
+                setLighting(s.action.split(':')[1] as LightingMode);
+              }
+            });
           } catch (error) {
             console.error(error);
             toast({
@@ -120,7 +138,7 @@ export default function ComfortTab() {
         recognitionRef.current = recognition;
       }
     }
-  }, [temperature, lighting, toast]);
+  }, [toast]);
 
   const handleVoiceInput = () => {
     if (!recognitionRef.current) {
@@ -295,7 +313,7 @@ export default function ComfortTab() {
                       <button
                         key={idx}
                         onClick={() => {
-                          suggestion.action();
+                          if (suggestion.action.startsWith("temperature:")) { setTemperature(parseInt(suggestion.action.split(":")[1])); } if (suggestion.action.startsWith("lighting:")) { setLighting(suggestion.action.split(":")[1] as LightingMode); }
                           setAnalysis(null);
                         }}
                         className="text-sm flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-primary font-semibold hover:bg-accent/90 transition-smooth shadow-sm hover:shadow-md"
