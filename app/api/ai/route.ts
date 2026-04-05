@@ -45,7 +45,7 @@ function analyzeWithKeywords(text: string, settings?: AIRequestBody['settings'])
       message: `I sensed you're feeling a bit cold. I suggest warming your room to ${newTemp}°C.`,
       actions: [
         { type: 'set_temperature', value: newTemp, label: `Set to ${newTemp}°C`, icon: '🌡️' },
-        { type: 'set_lighting', value: 'cozy', label: 'Switch to Cozy lighting', icon: '🕯️' },
+        { type: 'set_lighting', value: 'night', label: 'Switch to Night lighting', icon: '🕯️' },
       ],
     };
   }
@@ -68,9 +68,9 @@ function analyzeWithKeywords(text: string, settings?: AIRequestBody['settings'])
       mood: 'tired',
       intent: 'change_lighting',
       confidence: 0.82,
-      message: "You sound a bit tired, my dear. I suggest setting the lights to 'Cozy' to help you relax.",
+      message: "You sound a bit tired, my dear. I suggest setting the lights to 'Night' to help you relax.",
       actions: [
-        { type: 'set_lighting', value: 'cozy', label: 'Set to Cozy Lighting', icon: '🕯️' },
+        { type: 'set_lighting', value: 'night', label: 'Set to Night Lighting', icon: '🕯️' },
       ],
     };
   }
@@ -80,9 +80,9 @@ function analyzeWithKeywords(text: string, settings?: AIRequestBody['settings'])
       mood: 'relaxed',
       intent: 'change_lighting',
       confidence: 0.80,
-      message: "Of course! I've brightened the room so you can see better.",
+      message: "Of course! I've set the room to day lighting so you can see better.",
       actions: [
-        { type: 'set_lighting', value: 'bright', label: 'Set to Bright Lighting', icon: '💡' },
+        { type: 'set_lighting', value: 'day', label: 'Set to Bright Lighting', icon: '💡' },
       ],
     };
   }
@@ -92,9 +92,9 @@ function analyzeWithKeywords(text: string, settings?: AIRequestBody['settings'])
       mood: 'relaxed',
       intent: 'change_lighting',
       confidence: 0.78,
-      message: 'Setting a soft, ambient mood for you now.',
+      message: 'Setting an ambient mood for you now.',
       actions: [
-        { type: 'set_lighting', value: 'soft', label: 'Set to Soft Lighting', icon: '🌙' },
+        { type: 'set_lighting', value: 'ambient', label: 'Set to Ambient Lighting', icon: '🌙' },
       ],
     };
   }
