@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
 import { Analytics } from '@vercel/analytics/next'
 import Script from 'next/script'
+import GoogleTranslate from 'next-google-translate'
 import '@/src/styles/globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -71,22 +72,12 @@ export default function RootLayout({
         <body className="font-sans antialiased">
           {children}
           <Analytics />
-
-          <div id="google_translate_element" style={{ position: 'absolute', top: '-9999px', left: '-9999px', opacity: 0 }}></div>
-          {/* Google Translate Integration */}
-          <Script id="google-translate-init" strategy="afterInteractive">
-            {`
-              function googleTranslateElementInit() {
-                new window.google.translate.TranslateElement(
-                  { pageLanguage: 'en', includedLanguages: 'en,am', layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE },
-                  'google_translate_element'
-                );
-              }
-            `}
-          </Script>
-          <Script
-            src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
-            strategy="afterInteractive"
+          <GoogleTranslate
+            defaultLanguage="en"
+            supportedLanguages={['en', 'am']}
+            googleTranslateProps={{
+              includedLanguages: 'en,am',
+            }}
           />
         </body>
       </html>

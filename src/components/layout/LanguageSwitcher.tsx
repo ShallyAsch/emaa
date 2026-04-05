@@ -41,7 +41,7 @@ export default function LanguageSwitcher() {
     setActiveLang(langCode);
     setIsOpen(false);
 
-    // Google Translate's select loads asynchronously — retry until found
+    // Trigger Google Translate's select element
     const triggerTranslate = (retries = 0) => {
       const select = document.querySelector<HTMLSelectElement>('.goog-te-combo');
       if (select) {
@@ -50,7 +50,7 @@ export default function LanguageSwitcher() {
       } else if (retries < 10) {
         setTimeout(() => triggerTranslate(retries + 1), 500);
       } else {
-        // Fallback: Set cookie and reload if DOM injection fails
+        // Fallback: Set cookie and reload
         document.cookie = `googtrans=/en/${langCode}; path=/`;
         document.cookie = `googtrans=/en/${langCode}; path=/; domain=${window.location.hostname}`;
         window.location.reload();
