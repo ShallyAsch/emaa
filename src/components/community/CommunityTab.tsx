@@ -254,6 +254,7 @@ export default function CommunityTab() {
   // Override the first mock guest with the real user's name
   const guests = currentGuests.map((g, i) => i === 0 ? { ...g, name: currentUserName } : g);
 
+  const [isVisible, setIsVisible] = useState(true);
   const [likedMoments, setLikedMoments] = useState<string[]>([]);
   const [joinedActivities, setJoinedActivities] = useState<string[]>([]);
   const [showEmamaMessage, setShowEmamaMessage] = useState(true);
