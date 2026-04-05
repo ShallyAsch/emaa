@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
 import { Clock, MapPin, CheckCircle2, ChevronRight, AlertCircle, Square, CheckSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
