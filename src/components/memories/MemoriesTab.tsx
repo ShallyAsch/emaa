@@ -22,18 +22,36 @@ export default function MemoriesTab() {
   const { user, isLoaded } = useUser();
   const [showProfileEditor, setShowProfileEditor] = useState(false);
   const [profile, setProfile] = useState(defaultProfile);
-  const [loaded, setLoaded] = useState(false);
+  const [guestId] = useState(() => {
+    if (typeof window !== 'undefined') {
+      let id = localStorage.getItem('emama-guestId');
+      if (!id) {
+        id = `guest-${Date.now()}`;
+        localStorage.setItem('emama-guestId', id);
+      }
+      return id;
+    }
+    return `guest-${Date.now()}`;
+  });
 
   // Fetch family profile from DB
   useEffect(() => {
     if (!isLoaded) return;
 
-    const guestId = user?.id || `guest-${Date.now()}`;
-    const url = user ? '' : `?guestId=${guestId}`;
+    const clerkId = user?.id || guestId;
+    const url = user ? '' : `?guestId=${clerkId}`;
 
+    console.log('[memories] Fetching profile for:', clerkId);
     fetch(`/api/family-profile${url}`)
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) {
+          console.error('[memories] API error:', r.status);
+          return defaultProfile;
+        }
+        return r.json();
+      })
       .then(data => {
+        console.log('[memories] Got data:', data);
         setProfile({
           coffeePreference: data.coffee_preference || defaultProfile.coffeePreference,
           dietaryNotes: data.dietary_notes || defaultProfile.dietaryNotes,
@@ -41,10 +59,9 @@ export default function MemoriesTab() {
           previousVisits: data.previous_visits || defaultProfile.previousVisits,
           specialMoments: data.special_moments || defaultProfile.specialMoments,
         });
-        setLoaded(true);
       })
-      .catch(() => setLoaded(true));
-  }, [isLoaded, user]);
+      .catch(err => console.error('[memories] Fetch error:', err));
+  }, [isLoaded, user, guestId]);
 
   if (!isLoaded) {
     return (
@@ -123,7 +140,7 @@ export default function MemoriesTab() {
               }}
               onClose={() => setShowProfileEditor(false)}
               onSave={(updated) => setProfile(updated)}
-              guestId={!user ? `guest-${Date.now()}` : undefined}
+              guestId={!user ? guestId : undefined}
             />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
