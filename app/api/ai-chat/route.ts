@@ -5,6 +5,7 @@ interface VoiceAnalysis {
   transcript: string;
   mood: string;
   message: string;
+  confidence: number;
   suggestions: { icon: string; label: string; action: string }[];
 }
 
@@ -21,6 +22,7 @@ RESPONSE FORMAT (JSON ONLY):
 {
   "transcript": "${transcript}",
   "mood": "calm|stressed|cold|tired|hungry|excited|romantic|adventurous",
+  "confidence": 0.9,
   "message": "Your warm response to the guest",
   "suggestions": [
     { "icon": "🌡️", "label": "Adjust temperature to 24°C", "action": "temperature:24" },

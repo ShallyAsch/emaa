@@ -96,6 +96,11 @@ export default function ComfortTab() {
               body: JSON.stringify({ type: 'voice', message: transcript }),
             });
             const result = await res.json();
+
+            if (!res.ok) {
+              throw new Error(result.details || result.error || 'AI service failed');
+            }
+
             setAnalysis(result);
 
             // Auto-apply simple suggestions
@@ -108,10 +113,10 @@ export default function ComfortTab() {
               }
             });
           } catch (error) {
-            console.error(error);
+            console.error('Voice AI error:', error);
             toast({
-              title: "AI Analysis Error",
-              description: "Couldn't reach Emama right now. Please try again.",
+              title: "Emama couldn't hear you clearly",
+              description: "Please try again or tap the mic to retry.",
               variant: "destructive"
             });
           } finally {

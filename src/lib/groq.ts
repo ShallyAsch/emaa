@@ -25,10 +25,15 @@ export async function groqChat(systemPrompt: string, userMessage: string): Promi
 export async function groqJSON<T>(systemPrompt: string, userMessage: string): Promise<T> {
   const raw = await groqChat(systemPrompt, userMessage);
   // Strip markdown code blocks if present
-  const cleaned = raw.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
-  try {
-    return JSON.parse(cleaned) as T;
-  } catch {
-    throw new Error(`Failed to parse JSON from AI response: ${cleaned.slice(0, 200)}`);
+  let cleaned = raw.trim();
+  // Remove ```json or ``` wrappers
+  cleaned = cleaned.replace(/^```(?:json)?\s*/gm, '').replace(/```\s*$/gm, '').trim();
+  // Try to find JSON object in response
+  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    try {
+      return JSON.parse(jsonMatch[0]) as T;
+    } catch {}
   }
+  throw new Error(`Failed to parse JSON from AI response: ${cleaned.slice(0, 300)}`);
 }
