@@ -70,7 +70,7 @@ export default function ExploreTab() {
       {/* Satellite Map */}
       <div className="relative w-full h-[35vh] md:h-[45vh] bg-muted overflow-hidden">
         <iframe
-          src={`https://maps.google.com/maps?q=Kuriftu+Resort+Bishoftu&ll=${KURIFTU_LAT},${KURIFTU_LNG}&t=k&z=18&ie=UTF8&iwloc=&output=embed`}
+          src={`https://maps.google.com/maps?q=${KURIFTU_LAT},${KURIFTU_LNG}&t=k&z=20&ie=UTF8&iwloc=&output=embed`}
           width="100%" height="100%" style={{ border: 0 }}
           allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
           className="w-full h-full" title="Kuriftu Resort Satellite View"
