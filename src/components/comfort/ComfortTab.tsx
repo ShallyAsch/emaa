@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { mockGuest } from '@/src/lib/mockData';
 import { Mic, AlertCircle, Sun, Moon, Sunset, Lightbulb, User } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { analyzeMoodAndIntent, EmamaAnalysis } from '@/src/lib/aiAnalysis';
@@ -38,7 +37,7 @@ const lightingOptions: LightingOption[] = [
 
 export default function ComfortTab() {
   const { toast } = useToast();
-  const [temperature, setTemperature] = useState(72);
+  const [temperature, setTemperature] = useState(22);
   const [lighting, setLighting] = useState<LightingMode>('ambient');
   const [weather, setWeather] = useState<{ temp: number; condition: string; next_event: { label: string } } | null>(null);
 
@@ -354,7 +353,7 @@ export default function ComfortTab() {
             <div className="bg-muted/30 p-4 rounded-2xl flex gap-3 text-sm mt-4">
               <User className="w-5 h-5 text-muted-foreground shrink-0" />
               <p className="text-muted-foreground leading-relaxed">
-                Your preferred profile temperature is <span className="font-semibold text-foreground">{mockGuest.preferences.roomTemperature}°C</span>.
+                Adjust the slider to your preferred room temperature.
               </p>
             </div>
           </div>
@@ -370,13 +369,18 @@ export default function ComfortTab() {
             {lightingOptions.map((option) => {
               const IconComponent = option.icon;
               const isActive = lighting === option.mode;
+              const activeStyles = {
+                day: 'bg-sky-100 border-sky-300 shadow-sky-200',
+                night: 'bg-indigo-900/10 border-indigo-300 shadow-indigo-200',
+                ambient: 'bg-amber-100 border-amber-300 shadow-amber-200',
+              };
               return (
                 <button
                   key={option.mode}
                   onClick={() => setLighting(option.mode)}
                   className={`p-6 rounded-2xl transition-all duration-300 text-center flex flex-col items-center justify-center gap-3 ${
                     isActive
-                      ? 'bg-accent/15 border-2 border-accent shadow-md scale-[1.02]'
+                      ? `${activeStyles[option.mode]} border-2 shadow-md scale-[1.02]`
                       : 'bg-white hover:bg-muted/30 border-2 border-transparent shadow-sm'
                   }`}
                 >
@@ -407,14 +411,19 @@ export default function ComfortTab() {
 
           <div className="grid grid-cols-2 mt-2 gap-4">
             {[
-              { icon: '🛏️', label: 'Extra pillows', action: 'pillow-request' },
-              { icon: '🧴', label: 'More towels', action: 'towel-request' },
-              { icon: '🔇', label: 'Quieter room', action: 'quiet-request' },
-              { icon: '❄️', label: 'Extra blankets', action: 'blanket-request' },
+              { icon: '🛏️', label: 'Extra pillows', action: 'pillows' },
+              { icon: '🧴', label: 'More towels', action: 'towels' },
+              { icon: '🔇', label: 'Quieter room', action: 'quiet' },
+              { icon: '❄️', label: 'Extra blankets', action: 'blankets' },
             ].map((item) => (
                <button
                  key={item.action}
                  onClick={() => {
+                   fetch('/api/service-request', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({ type: item.action }),
+                   }).catch(() => {});
                    toast({
                      title: "Service Request",
                      description: `We will bring ${item.label.toLowerCase()} to your room instantly.`
