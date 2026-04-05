@@ -195,8 +195,11 @@ export default function EventsTab() {
                           <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                         </button>
                       ) : (
-                        <button className="flex-1 bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-2 rounded-lg transition-smooth text-sm flex items-center justify-center gap-2 group/btn">
-                          Join
+                        <button
+                          onClick={() => handleTertTert(event)}
+                          className="flex-1 bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-2 rounded-lg transition-smooth text-sm flex items-center justify-center gap-2 group/btn"
+                        >
+                          Reserve
                           <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                         </button>
                       )}

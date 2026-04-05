@@ -95,9 +95,9 @@ export default function ScrollableEvents() {
             </div>
           ))}
 
-          {/* Explore More Button */}
+          {/* Explore More Events Button */}
           <Link
-            href="/today"
+            href="/events"
             className="flex-shrink-0 w-72 glass rounded-2xl p-6 shadow-warm hover:shadow-warm-md transition-smooth snap-start flex flex-col items-center justify-center gap-4"
           >
             <h3 className="font-serif text-lg font-bold text-primary text-center">
