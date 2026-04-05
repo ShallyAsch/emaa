@@ -510,11 +510,9 @@ export default function MyScheduleTab() {
       </div>
 
       {/* Preparation Modal */}
-      {showPreparation && (
+      {showPreparation && allActivities.find(a => a.id === showPreparation) && (
         <PreparationModal
-          activity={
-            allActivities.find((a) => a.id === showPreparation)!
-          }
+          activity={allActivities.find(a => a.id === showPreparation)!}
           onClose={() => setShowPreparation(null)}
         />
       )}
