@@ -114,7 +114,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           {/* Right: Auth + Language + Mobile Toggle */}
           <div className="flex items-center gap-3">
             {/* Auth Section */}
-            <div className="hidden sm:flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <UserButton
                 afterSignOutUrl="/"
                 appearance={{ elements: { avatarBox: 'w-9 h-9' } }}
@@ -194,6 +194,22 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   <span>{item.label}</span>
                 </Link>
               ))}
+
+              {/* Mobile Auth Links */}
+              <div className="pt-4 mt-4 border-t border-white/10 space-y-2">
+                <SignInButton mode="modal">
+                  <button className="flex items-center gap-4 w-full px-4 py-4 rounded-xl text-white hover:bg-white/10 transition-smooth">
+                    <LogIn className="w-6 h-6" />
+                    <span>Sign In</span>
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button className="flex items-center gap-4 w-full px-4 py-4 rounded-xl text-white hover:bg-white/10 transition-smooth">
+                    <UserPlus className="w-6 h-6" />
+                    <span>Sign Up</span>
+                  </button>
+                </SignUpButton>
+              </div>
             </div>
           </div>
         </>
