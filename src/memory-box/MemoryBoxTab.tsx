@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import Image from 'next/image';
+import { useUser } from '@clerk/nextjs';
 import {
   Heart,
   Share2,
@@ -20,8 +21,7 @@ import {
   Video,
   Filter,
 } from 'lucide-react';
-import ExperienceModal from '@/components/shared/ExperienceModal';
-import { mockGuest } from '@/lib/mockData';
+import ExperienceModal from '@/src/components/shared/ExperienceModal';
 
 interface Memory {
   id: string;
@@ -251,15 +251,18 @@ const heroImages = [
   'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/photo_7_2026-04-05_13-26-52-nTN5ap3SSOhqlML9CYqqvfrtcdB5eO.jpg', // 11: Sisters in White
 ];
 
-const aiStorySummary = {
-  title: 'Your Time at Kuriftu in 3 Moments',
-  content: `Dear ${mockGuest.name}, your journey with us was filled with warmth and discovery. From your first buna ceremony where you learned the ancient art of Ethiopian coffee, to the night you danced Eskista under the stars, to the quiet mornings by the garden - each moment became a thread in the tapestry of your story here. You didn't just visit Kuriftu; you became part of our family. We carry these memories with you, always.`,
-  signature: '- Emama Zinashe',
-};
-
 type FilterType = 'all' | 'photos' | 'videos' | 'events' | 'people';
 
 export default function MemoryBoxTab() {
+  const { user } = useUser();
+  const userName = user?.firstName || user?.username || 'Guest';
+
+  const aiStorySummary = {
+    title: 'Your Time at Kuriftu in 3 Moments',
+    content: `Dear ${userName}, your journey with us was filled with warmth and discovery. From your first buna ceremony where you learned the ancient art of Ethiopian coffee, to the night you danced Eskista under the stars, to the quiet mornings by the garden - each moment became a thread in the tapestry of your story here. You didn't just visit Kuriftu; you became part of our family. We carry these memories with you, always.`,
+    signature: '- Emama Zinashe',
+  };
+
   const [viewMode, setViewMode] = useState<'grid' | 'timeline'>('grid');
   const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
