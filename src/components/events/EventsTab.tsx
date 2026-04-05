@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { ChevronRight, Share2, Bell, Heart, Zap, Sparkles } from 'lucide-react';
 import ExperienceModal from '@/src/components/shared/ExperienceModal';
+import EmamaAssistant from '@/src/components/shared/EmamaAssistant';
 import { mockActivities } from '@/src/lib/mockData';
 
 interface BookedEvent {
@@ -336,6 +337,11 @@ export default function EventsTab() {
           closingNote="This is part of your home story ❤️"
         />
       )}
+
+      {/* Emama Zinashe Floating AI Assistant */}
+      <EmamaAssistant
+        message="Looking for something magical to experience tonight? I know just the event that will make your evening unforgettable!"
+      />
     </div>
   );
 }

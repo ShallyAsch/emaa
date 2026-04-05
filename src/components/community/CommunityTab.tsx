@@ -61,7 +61,7 @@ const currentGuests: Guest[] = [
     name: 'Hirut',
     location: 'Bahir Dar',
     interests: ['Storytelling', 'Art', 'Coffee'],
-    avatar: '/guest-1.jpg',
+    avatar: '/hirut.jpg',
     isVisible: true,
     personality: 'Artistic, thoughtful, great listener',
   },
@@ -70,16 +70,16 @@ const currentGuests: Guest[] = [
     name: 'Chen',
     location: 'Shanghai, China',
     interests: ['Traditional Games', 'Food', 'Wellness'],
-    avatar: '/guest-2.jpg',
+    avatar: '/chen.jpg',
     isVisible: true,
     personality: 'Curious, mindful, appreciates traditions',
   },
   {
     id: '5',
-    name: 'Selam',
+    name: 'Anania',
     location: 'Dire Dawa',
     interests: ['Music', 'Dance', 'Coffee'],
-    avatar: '/guest-1.jpg',
+    avatar: '/anania.jpg',
     isVisible: true,
     personality: 'Energetic, musical, loves celebrations',
   },
@@ -88,7 +88,7 @@ const currentGuests: Guest[] = [
     name: 'James',
     location: 'New York, USA',
     interests: ['History', 'Photography', 'Hiking'],
-    avatar: '/guest-2.jpg',
+    avatar: '/james.jpg',
     isVisible: true,
     personality: 'Intellectual, curious, loves learning',
   },
@@ -97,7 +97,7 @@ const currentGuests: Guest[] = [
     name: 'Tigist',
     location: 'Gondar',
     interests: ['Weaving', 'Art', 'Traditional Games'],
-    avatar: '/guest-1.jpg',
+    avatar: '/tigist.jpg',
     isVisible: true,
     personality: 'Creative, patient, skilled artisan',
   },
@@ -106,7 +106,7 @@ const currentGuests: Guest[] = [
     name: 'Emma',
     location: 'Berlin, Germany',
     interests: ['Wellness', 'Food', 'Culture'],
-    avatar: '/guest-2.jpg',
+    avatar: '/emma.jpg',
     isVisible: true,
     personality: 'Mindful, health-conscious, appreciates quality',
   },
@@ -115,7 +115,7 @@ const currentGuests: Guest[] = [
     name: 'Dawit',
     location: 'Hawassa',
     interests: ['Coffee', 'Music', 'Storytelling'],
-    avatar: '/guest-1.jpg',
+    avatar: '/dawit.jpg',
     isVisible: true,
     personality: 'Charismatic, musical, great conversationalist',
   },
@@ -124,7 +124,7 @@ const currentGuests: Guest[] = [
     name: 'Sophie',
     location: 'Paris, France',
     interests: ['Art', 'Food', 'Photography'],
-    avatar: '/guest-2.jpg',
+    avatar: '/sophie.jpg',
     isVisible: true,
     personality: 'Elegant, artistic, appreciates beauty',
   },
@@ -133,7 +133,7 @@ const currentGuests: Guest[] = [
     name: 'Yonas',
     location: 'Mekelle',
     interests: ['History', 'Traditional Games', 'Hiking'],
-    avatar: '/guest-1.jpg',
+    avatar: '/yonas.jpg',
     isVisible: true,
     personality: 'Knowledgeable, adventurous, great guide',
   },
@@ -142,7 +142,7 @@ const currentGuests: Guest[] = [
     name: 'Mia',
     location: 'Sydney, Australia',
     interests: ['Wellness', 'Dance', 'Culture'],
-    avatar: '/guest-2.jpg',
+    avatar: '/mia.jpg',
     isVisible: true,
     personality: 'Vibrant, active, loves new experiences',
   },
@@ -353,15 +353,15 @@ export default function CommunityTab() {
 
       {/* AI Match Suggestion */}
       {showEmamaMessage && sharedInterestGuests.length > 0 && (
-        <div className="px-4 md:px-8 mt-6">
-          <div className="bg-gradient-to-r from-accent/15 to-accent/8 border border-accent/25 rounded-xl p-4 max-w-2xl">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Sparkles className="w-5 h-5 text-accent" />
+        <div className="px-4 md:px-8 mt-4">
+          <div className="bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/20 rounded-lg p-3 max-w-xl">
+            <div className="flex items-start gap-2.5">
+              <div className="w-8 h-8 bg-accent/20 rounded-md flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-4 h-4 text-accent" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-foreground text-sm mb-0.5">Emama Zinashe noticed something</h3>
-                <p className="text-muted-foreground text-xs leading-relaxed mb-3">
+                <h3 className="font-semibold text-foreground text-xs mb-0.5">Emama Zinashe noticed something</h3>
+                <p className="text-muted-foreground text-[11px] leading-relaxed mb-2">
                   You and {sharedInterestGuests.length} other guests both love traditional games —
                   would you like to join a Gebeta game at 4 PM today?
                 </p>

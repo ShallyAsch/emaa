@@ -86,32 +86,36 @@ export default function MyScheduleTab() {
   const [checkedActivities, setCheckedActivities] = useState<Set<string>>(new Set());
   const [addingActivities, setAddingActivities] = useState(false);
 
-  // Load booked events + progress from Turso DB
+  // Load booked events from localStorage (always) + Turso DB (if logged in)
   useEffect(() => {
+    // Load from localStorage first
+    const storedEvents = JSON.parse(localStorage.getItem('bookedEvents') || '[]') as any[];
+    if (storedEvents.length > 0) {
+      const localActivities: ScheduledActivity[] = storedEvents.map((ev: any) => ({
+        id: `booked-${ev.id}`,
+        time: ev.time,
+        title: ev.title,
+        location: 'Main Venue',
+        description: ev.description || '',
+        whatToWear: ['Comfortable clothing'],
+        preparation: ['Arrive 10 minutes early'],
+        image: ev.image || '/culture-hero.jpg',
+        completed: false,
+        fromBooking: true,
+      }));
+      setAllActivities(prev => {
+        const ids = new Set(prev.map(a => a.id));
+        const newActs = localActivities.filter(a => !ids.has(a.id));
+        return [...prev, ...newActs];
+      });
+    }
+
+    // If logged in, also load from DB
     if (!user?.id) return;
     fetch('/api/schedule')
       .then(r => r.json())
       .then(data => {
         if (data.completedActivities) setCheckedActivities(new Set(data.completedActivities));
-        if (data.events && data.events.length > 0) {
-          const bookedActivities: ScheduledActivity[] = data.events.map((ev: any) => ({
-            id: `booked-${ev.id}`,
-            time: ev.time,
-            title: ev.title,
-            location: 'Main Venue',
-            description: '',
-            whatToWear: ['Comfortable clothing'],
-            preparation: ['Arrive 10 minutes early'],
-            image: ev.image,
-            completed: false,
-            fromBooking: true,
-          }));
-          setAllActivities(prev => {
-            const ids = new Set(prev.map(a => a.id));
-            const newActs = bookedActivities.filter(a => !ids.has(a.id));
-            return [...prev, ...newActs];
-          });
-        }
       })
       .catch(() => {});
   }, [user?.id]);
@@ -391,12 +395,11 @@ export default function MyScheduleTab() {
           </p>
           <button
             onClick={async () => {
-              if (!user?.id) return;
               setAddingActivities(true);
               try {
                 // Fetch preferences to inform AI
                 const prefsRes = await fetch('/api/preferences');
-                const prefs = await prefsRes.json();
+                const prefs = await prefsRes.ok ? await prefsRes.json() : {};
                 const prefsStr = prefs.favorite_foods?.length || prefs.activities?.length
                   ? `Interests: ${(prefs.favorite_foods || []).join(', ')}. Activities: ${(prefs.activities || []).join(', ')}. Personality: ${prefs.personality_type || ''}. Traveling: ${prefs.travel_context || ''}.`
                   : '';

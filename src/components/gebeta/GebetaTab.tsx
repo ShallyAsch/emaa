@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { Heart, Sparkles, Flame, Leaf, Star, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import EmamaAssistant from '@/src/components/shared/EmamaAssistant';
 
 interface FoodItem {
   id: string;
@@ -645,6 +646,11 @@ export default function GebetaTab() {
           </div>
         </div>
       </div>
+
+      {/* Emama Zinashe Floating AI Assistant */}
+      <EmamaAssistant
+        message="Hungry, my dear? I know exactly which dish will warm your heart today. Shall I recommend something special?"
+      />
     </div>
   );
 }
