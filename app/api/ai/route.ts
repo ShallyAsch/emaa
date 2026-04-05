@@ -250,13 +250,12 @@ function analyzeWithKeywords(text: string, settings?: AIRequestBody['settings'])
   };
 }
 
-// ===== AI API call using Google Gemini =====
+// ===== AI API call using Groq (Llama 3.3 70B) =====
 
-async function analyzeWithGemini(
+async function analyzeWithGroq(
   text: string,
   settings: AIRequestBody['settings'],
-  context: AIRequestBody['context'],
-  apiKey: string
+  context: AIRequestBody['context']
 ): Promise<AIResponsePayload> {
   const systemInstruction = `You are Emama Zinashe, a warm and caring Ethiopian hospitality AI concierge for a luxury resort called "Ende Bete". You analyze guest messages to understand their mood, intent, and needs.
 
@@ -292,19 +291,28 @@ Rules:
 - Always provide at least one action when intent is not "general_chat" or when improving a mood.
 - Keep messages concise but heartfelt. Respond like a caring grandmother who knows everything about the resort.`;
 
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) throw new Error('GROQ_API_KEY not configured');
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 15000);
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-    const response = await fetch(url, {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
       body: JSON.stringify({
-        system_instruction: { parts: { text: systemInstruction } },
-        contents: [{ role: 'user', parts: [{ text }] }],
-        generationConfig: { response_mime_type: "application/json", temperature: 0.4 },
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: systemInstruction },
+          { role: 'user', content: text }
+        ],
+        temperature: 0.4,
+        max_tokens: 500,
+        response_format: { type: 'json_object' },
       }),
       signal: controller.signal,
     });
@@ -313,13 +321,13 @@ Rules:
 
     if (!response.ok) {
       const errData = await response.text();
-      throw new Error(`Gemini API returned ${response.status}: ${errData}`);
+      throw new Error(`Groq API returned ${response.status}: ${errData}`);
     }
 
     const data = await response.json();
-    const contentText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const contentText = data.choices?.[0]?.message?.content;
 
-    if (!contentText) throw new Error('Gemini API returned empty content');
+    if (!contentText) throw new Error('Groq API returned empty content');
 
     const parsed = JSON.parse(contentText) as AIResponsePayload;
 
@@ -350,24 +358,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message must be under 2000 characters' }, { status: 400 });
     }
 
-    const apiKey = process.env.GOOGLE_API_KEY;
+    const groqKey = process.env.GROQ_API_KEY;
 
     let result: AIResponsePayload;
 
-    // Try Gemini AI first
-    if (apiKey) {
+    // Try Groq AI first
+    if (groqKey) {
       try {
-        result = await analyzeWithGemini(body.message, body.settings, body.context, apiKey);
+        result = await analyzeWithGroq(body.message, body.settings, body.context);
       } catch (aiError) {
-        // Gemini failed — use keyword result as fallback
-        console.warn('Gemini API unavailable, using keyword analysis');
+        // Groq failed — use keyword result as fallback
+        console.warn('Groq API unavailable, using keyword analysis');
         result = analyzeWithKeywords(body.message, body.settings);
-        result.reasoning = 'Fallback: Gemini API unavailable, used keyword matching';
+        result.reasoning = 'Fallback: Groq API unavailable, used keyword matching';
       }
     } else {
       // No API key — use keywords
       result = analyzeWithKeywords(body.message, body.settings);
-      result.reasoning = 'No GOOGLE_API_KEY, used keyword matching';
+      result.reasoning = 'No GROQ_API_KEY, used keyword matching';
     }
 
     return NextResponse.json(result);
