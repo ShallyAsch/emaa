@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
-import { MapPin, Star, Clock, Sparkles } from 'lucide-react';
+import { MapPin, Star, Clock, Sparkles, ExternalLink } from 'lucide-react';
 
 // Kuriftu African Village, Bishoftu — verified GPS coordinates
 const KURIFTU_LAT = 8.7503;
@@ -18,93 +18,54 @@ interface Location {
   rating: number;
   distance: string;
   openHours: string;
-  lat: number;
-  lng: number;
+  mapsUrl: string;
   aiReason?: string;
 }
 
-// Real places around Kuriftu African Village, Bishoftu (Debre Zeit)
+// Real places around Kuriftu African Village, Bishoftu (Debre Zeit) — verified Google Maps links
 const allLocations: Location[] = [
   {
     id: '1', name: 'Lake Hora', type: 'nature',
     description: 'The iconic crater lake right next to Kuriftu, famous for hippo watching and sunset boat rides.',
     image: '/ethiopian-landscape.jpg', rating: 4.9, distance: '0.5 km', openHours: '6:00 AM – 7:00 PM',
-    lat: 8.7520, lng: 38.9800, aiReason: 'Perfect for your love of nature',
+    mapsUrl: 'https://maps.app.goo.gl/fdTmjhBTdMrNZcfu6', aiReason: 'Perfect for your love of nature',
   },
   {
-    id: '2', name: 'Kuriftu Coffee Ceremony', type: 'cultural',
-    description: 'Daily traditional Ethiopian coffee roasting and serving at the resort pavilion.',
-    image: '/buna-ceremony.jpg', rating: 4.9, distance: 'On-site', openHours: '9:00 AM – 6:00 PM',
-    lat: KURIFTU_LAT, lng: KURIFTU_LNG, aiReason: 'Based on your cultural interests',
-  },
-  {
-    id: '3', name: 'Kuriftu Spa & Wellness', type: 'spa',
-    description: 'Full-service spa with Ethiopian honey treatments, massage, and aromatherapy.',
-    image: '/spa-wellness.jpg', rating: 4.8, distance: 'On-site', openHours: '8:00 AM – 8:00 PM',
-    lat: KURIFTU_LAT, lng: KURIFTU_LNG, aiReason: 'You mentioned wanting relaxation',
-  },
-  {
-    id: '4', name: 'Kuriftu Restaurant', type: 'restaurant',
-    description: 'Main dining hall serving authentic Ethiopian cuisine — injera, doro wat, kitfo, and more.',
-    image: '/dining-hall.jpg', rating: 4.7, distance: 'On-site', openHours: '7:00 AM – 10:00 PM',
-    lat: KURIFTU_LAT, lng: KURIFTU_LNG, aiReason: 'Perfect for your love of traditional food',
-  },
-  {
-    id: '5', name: 'Kuriftu Garden Terrace', type: 'nature',
-    description: 'Manicured garden paths with panoramic views of Lake Hora and the surrounding highlands.',
-    image: '/pool-garden.jpg', rating: 5.0, distance: 'On-site', openHours: 'Always open',
-    lat: KURIFTU_LAT + 0.001, lng: KURIFTU_LNG + 0.001, aiReason: 'Ideal for your evening relaxation',
-  },
-  {
-    id: '6', name: 'Bishoftu Market (Gulit)', type: 'shopping',
-    description: 'Open-air market with fresh produce, handwoven shawls, spices, and traditional crafts.',
-    image: '/culture-hero.jpg', rating: 4.5, distance: '2.5 km', openHours: '7:00 AM – 5:00 PM',
-    lat: 8.7510, lng: 38.9720, aiReason: 'Discover authentic Ethiopian crafts',
-  },
-  {
-    id: '7', name: 'Debre Sina Michael Church', type: 'heritage',
-    description: 'Historic rock-hewn Orthodox church dating back centuries, perched on a hilltop overlooking Bishoftu.',
+    id: '2', name: 'St Michael Church', type: 'heritage',
+    description: 'Historic Orthodox church with stunning murals and ancient religious artifacts, perched on a hilltop overlooking Bishoftu.',
     image: '/culture-hero.jpg', rating: 4.8, distance: '3 km', openHours: '7:00 AM – 5:00 PM',
-    lat: 8.7480, lng: 38.9810, aiReason: 'Rich in the history you appreciate',
+    mapsUrl: 'https://maps.app.goo.gl/79XiqjXf96FEUuWQ7', aiReason: 'Rich in the history you appreciate',
   },
   {
-    id: '8', name: 'Tej Bet (Honey Wine House)', type: 'restaurant',
-    description: 'Local tej house serving traditional Ethiopian honey wine with live azmari music in the evenings.',
+    id: '3', name: 'Bishoftu Market (Gulit)', type: 'shopping',
+    description: 'Open-air market with fresh produce, handwoven shawls, spices, and traditional Ethiopian crafts.',
+    image: '/culture-hero.jpg', rating: 4.5, distance: '2.5 km', openHours: '7:00 AM – 5:00 PM',
+    mapsUrl: 'https://maps.app.goo.gl/nAUdd3QFryiyH5jr6', aiReason: 'Discover authentic Ethiopian crafts',
+  },
+  {
+    id: '4', name: 'Tej Bet', type: 'restaurant',
+    description: 'Local honey wine house serving traditional Ethiopian tej with live azmari music in the evenings.',
     image: '/dining-hall.jpg', rating: 4.6, distance: '1.8 km', openHours: '4:00 PM – 11:00 PM',
-    lat: 8.7490, lng: 38.9700, aiReason: 'A unique evening experience',
+    mapsUrl: 'https://maps.app.goo.gl/q4LKePUajEK8gnk5A', aiReason: 'A unique evening experience',
   },
   {
-    id: '9', name: 'Lake Bishoftu Walking Trail', type: 'nature',
+    id: '5', name: 'Lake Bishoftu', type: 'nature',
     description: 'Scenic lakeside walking path around Lake Bishoftu, perfect for morning jogs and bird watching.',
     image: '/ethiopian-landscape.jpg', rating: 4.7, distance: '1.2 km', openHours: '5:00 AM – 7:00 PM',
-    lat: 8.7560, lng: 38.9750, aiReason: 'A serene nature experience',
+    mapsUrl: 'https://maps.app.goo.gl/dBex4c3bqz2jHZZWA', aiReason: 'A serene nature experience',
   },
   {
-    id: '10', name: 'Kuriftu Pool & Lounge', type: 'spa',
-    description: 'Resort swimming pool with sun loungers, poolside bar, and Lake Hora views.',
-    image: '/pool-garden.jpg', rating: 4.9, distance: 'On-site', openHours: '6:00 AM – 9:00 PM',
-    lat: KURIFTU_LAT, lng: KURIFTU_LNG, aiReason: 'For your moments of tranquility',
-  },
-  {
-    id: '11', name: 'Azmari Music Night', type: 'cultural',
-    description: 'Live traditional Ethiopian music with masinko and krar performances at the resort lounge.',
-    image: '/culture-hero.jpg', rating: 4.8, distance: 'On-site', openHours: '7:00 PM – 11:00 PM',
-    lat: KURIFTU_LAT, lng: KURIFTU_LNG, aiReason: 'Experience the soul of Ethiopian music',
-  },
-  {
-    id: '12', name: 'Bishoftu Town Center', type: 'shopping',
+    id: '6', name: 'Bishoftu Town Center', type: 'shopping',
     description: 'Central Bishoftu with cafes, shops, and the weekly local market. A short walk from the resort.',
     image: '/culture-hero.jpg', rating: 4.4, distance: '2 km', openHours: '8:00 AM – 8:00 PM',
-    lat: 8.7515, lng: 38.9700, aiReason: 'Explore the local scene',
+    mapsUrl: 'https://www.google.com/maps/search/Bishoftu+Town+Center+Ethiopia', aiReason: 'Explore the local scene',
   },
 ];
 
 const typeConfig: Record<string, { icon: string; bg: string }> = {
   all: { icon: '✨', bg: 'bg-[#D4A017]' },
-  cultural: { icon: '🏛️', bg: 'bg-amber-500' },
-  restaurant: { icon: '🍽️', bg: 'bg-red-500' },
-  spa: { icon: '💆', bg: 'bg-teal-500' },
   nature: { icon: '🌿', bg: 'bg-green-500' },
+  restaurant: { icon: '🍽️', bg: 'bg-red-500' },
   shopping: { icon: '🛍️', bg: 'bg-purple-500' },
   heritage: { icon: '⛪', bg: 'bg-orange-500' },
 };
@@ -139,15 +100,9 @@ export default function ExploreTab() {
             case 'restaurant':
               return foods.some(f => ['spicy', 'traditional', 'comfort', 'sharing'].includes(f)) ||
                      personality.includes('adventurer');
-            case 'spa':
-              return acts.includes('spa') || hobbies.includes('meditation') || hobbies.includes('reading') ||
-                     personality.includes('relaxer');
             case 'nature':
               return acts.includes('nature') || hobbies.includes('hiking') || hobbies.includes('photography') ||
                      personality.includes('adventurer') || personality.includes('explorer');
-            case 'cultural':
-              return acts.includes('cultural') || hobbies.includes('art') ||
-                     personality.includes('explorer') || personality.includes('social');
             case 'heritage':
               return hobbies.includes('photography') || hobbies.includes('reading') ||
                      personality.includes('explorer');
@@ -274,12 +229,13 @@ export default function ExploreTab() {
                     </span>
                   </div>
                   <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`}
+                    href={loc.mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full inline-flex items-center justify-center gap-1.5 bg-[#D4A017] hover:bg-[#D4A017]/90 text-white text-xs font-medium py-2 rounded-lg transition-colors"
                   >
                     <MapPin className="w-3.5 h-3.5" /> Go there
+                    <ExternalLink className="w-3 h-3 ml-1 opacity-70" />
                   </a>
                 </div>
               </div>
