@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
-import { MapPin, Star, Sparkles, ChevronRight, Clock, Phone } from 'lucide-react';
+import { MapPin, Star, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface Location {
@@ -112,7 +112,6 @@ const typeConfig: Record<string, { icon: string; color: string; bg: string }> = 
 
 export default function ExploreTab() {
   const { user, isLoaded } = useUser();
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [activeFilter, setActiveFilter] = useState('all');
   const [suggestions, setSuggestions] = useState<Location[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(true);
@@ -177,42 +176,15 @@ export default function ExploreTab() {
       </div>
 
       {/* Map Section */}
-      <div className="relative w-full h-[45vh] md:h-[55vh] bg-muted overflow-hidden">
+      <div className="relative w-full h-[40vh] md:h-[50vh] bg-muted overflow-hidden">
         <iframe
-          src={`https://maps.google.com/maps?q=${mapLocation.lat},${mapLocation.lng}&t=m&z=15&ie=UTF8&iwloc=&output=embed`}
+          src={`https://maps.google.com/maps?q=${KURIFTU_LAT},${KURIFTU_LNG}&t=m&z=14&ie=UTF8&iwloc=&output=embed`}
           width="100%" height="100%" style={{ border: 0 }}
           allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
           className="w-full h-full" title="Kuriftu Resort Map"
         />
-        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow text-sm font-medium text-[#4B3425]">
-          📍 {selectedLocation?.name || 'Kuriftu African Village, Bishoftu'}
-        </div>
-        {selectedLocation && (
-          <button
-            onClick={() => setSelectedLocation(null)}
-            className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow text-sm text-muted-foreground hover:text-foreground"
-          >
-            Reset view
-          </button>
-        )}
-      </div>
-
-      {/* AI Suggestion Card */}
-      <div className="mx-4 md:mx-8 -mt-8 relative z-10">
-        <div className="bg-gradient-to-r from-[#4B3425] to-[#4B3425]/80 rounded-2xl p-5 text-white shadow-2xl">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-6 h-6" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-lg mb-1">Emama recommends</h3>
-              <p className="text-white/80 text-sm">
-                {isLoaded && user
-                  ? `Based on your preferences, I've curated experiences just for you, ${user.firstName || 'guest'}!`
-                  : 'Discover the best experiences around Kuriftu. Sign in for personalized picks!'}
-              </p>
-            </div>
-          </div>
+        <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow text-xs text-[#4B3425]">
+          📍 Kuriftu African Village, Bishoftu
         </div>
       </div>
 
@@ -235,7 +207,7 @@ export default function ExploreTab() {
         </div>
       </div>
 
-      {/* Suggestions Grid */}
+      {/* Locations Grid */}
       <div className="px-4 md:px-8 py-8">
         {loadingSuggestions ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -280,21 +252,13 @@ export default function ExploreTab() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      onClick={() => setSelectedLocation(location)}
-                      className="flex-1 bg-[#D4A017] hover:bg-[#D4A017]/90 text-white"
-                      size="sm"
-                    >
-                      <MapPin className="w-4 h-4 mr-1" /> Go there
-                    </Button>
                     <a
-                      href={`https://www.google.com/maps/dir/${KURIFTU_LAT},${KURIFTU_LNG}/${location.lat},${location.lng}`}
+                      href={`https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-border hover:bg-muted transition-colors"
-                      aria-label="Get directions"
+                      className="flex-1 inline-flex items-center justify-center gap-1 bg-[#D4A017] hover:bg-[#D4A017]/90 text-white text-sm font-medium py-2 rounded-lg transition-colors"
                     >
-                      <ChevronRight className="w-4 h-4" />
+                      <MapPin className="w-4 h-4" /> Go there
                     </a>
                   </div>
                 </div>
