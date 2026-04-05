@@ -11,13 +11,14 @@ const serviceLabels: Record<string, string> = {
 
 export async function POST(req: Request) {
   const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const { type } = await req.json();
     const label = serviceLabels[type] || type;
-    await createServiceRequest(userId, label);
-    console.log(`[service-request] Created: ${label} for ${userId}`);
+    // Use userId if authenticated, or 'guest-' + timestamp for anonymous
+    const clerkId = userId || `guest-${Date.now()}`;
+    await createServiceRequest(clerkId, label);
+    console.log(`[service-request] Created: ${label} for ${clerkId}`);
     return NextResponse.json({ success: true, message: `${label} requested` });
   } catch (err) {
     console.error('[service-request] Error:', err);
