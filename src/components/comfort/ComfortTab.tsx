@@ -40,6 +40,7 @@ export default function ComfortTab() {
   const [temperature, setTemperature] = useState(22);
   const [lighting, setLighting] = useState<LightingMode>('ambient');
   const [weather, setWeather] = useState<{ temp: number; condition: string; next_event: { label: string } } | null>(null);
+  const [sentRequests, setSentRequests] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetch('/api/weather')
@@ -431,28 +432,37 @@ export default function ComfortTab() {
               { icon: '🧴', label: 'More towels', action: 'towels' },
               { icon: '🔇', label: 'Quieter room', action: 'quiet' },
               { icon: '❄️', label: 'Extra blankets', action: 'blankets' },
-            ].map((item) => (
+            ].map((item) => {
+              const isSent = sentRequests.has(item.action);
+              return (
                <button
                  key={item.action}
                  onClick={() => {
+                   if (isSent) return;
+                   setSentRequests(prev => new Set(prev).add(item.action));
                    fetch('/api/service-request', {
                      method: 'POST',
                      headers: { 'Content-Type': 'application/json' },
                      body: JSON.stringify({ type: item.action }),
                    }).catch(() => {});
                    toast({
-                     title: "Service Request",
+                     title: "Request Sent! ✓",
                      description: `We will bring ${item.label.toLowerCase()} to your room instantly.`
                    });
                  }}
-                 className="flex flex-col sm:flex-row items-center sm:justify-start justify-center gap-3 p-4 sm:p-5 rounded-2xl bg-white hover:bg-accent/10 transition-all border border-border/50 shadow-sm hover:shadow-warm hover:border-accent/40"
+                 className={`flex flex-col sm:flex-row items-center sm:justify-start justify-center gap-3 p-4 sm:p-5 rounded-2xl transition-all border shadow-sm ${
+                   isSent
+                     ? 'bg-green-50 border-green-300 text-green-700'
+                     : 'bg-white hover:bg-accent/10 border-border/50 hover:shadow-warm hover:border-accent/40'
+                 }`}
                >
-                 <span className="text-3xl sm:text-2xl drop-shadow-sm">{item.icon}</span>
-                 <span className="font-semibold text-[13px] sm:text-sm text-foreground text-center sm:text-left leading-tight">
-                   {item.label}
+                 <span className={`text-3xl sm:text-2xl ${isSent ? 'scale-110' : 'drop-shadow-sm'} transition-transform`}>{isSent ? '✓' : item.icon}</span>
+                 <span className={`font-semibold text-[13px] sm:text-sm text-center sm:text-left leading-tight ${isSent ? 'text-green-700' : 'text-foreground'}`}>
+                   {isSent ? 'Sent!' : item.label}
                  </span>
                </button>
-            ))}
+              );
+            })}
           </div>
         </div>
 
