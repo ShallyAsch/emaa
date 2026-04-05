@@ -289,4 +289,10 @@ export default function ProfileTab() {
       {showModal && <PreferencesModal onClose={handleModalClose} />}
     </div>
   );
+
+
+      {/* Emama Zinashe Floating AI Assistant */}
+      <EmamaAssistant page="profile" />
+    </div>
+  );
 }

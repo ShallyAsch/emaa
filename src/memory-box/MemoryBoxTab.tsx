@@ -1221,4 +1221,10 @@ export default function MemoryBoxTab() {
       )}
     </div>
   );
+
+
+      {/* Emama Zinashe Floating AI Assistant */}
+      <EmamaAssistant page="memory-box" />
+    </div>
+  );
 }

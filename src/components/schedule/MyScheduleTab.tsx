@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
 import { Clock, MapPin, CheckCircle2, ChevronRight, AlertCircle, Square, CheckSquare, Sparkles } from 'lucide-react';
+import EmamaAssistant from '@/src/components/shared/EmamaAssistant';
 import { Button } from '@/components/ui/button';
 
 interface ScheduledActivity {
@@ -512,7 +513,10 @@ export default function MyScheduleTab() {
       })()}
     </div>
   );
+
+
+      {/* Emama Zinashe Floating AI Assistant */}
+      <EmamaAssistant page="schedule" />
+    </div>
+  );
 }
-
-
-

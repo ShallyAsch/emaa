@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
 import { Heart, Eye, EyeOff, Sparkles, Calendar, Users, MessageCircle, ChevronRight, X, UserPlus } from 'lucide-react';
+import EmamaAssistant from '@/src/components/shared/EmamaAssistant';
 import { Button } from '@/components/ui/button';
 
 interface Guest {
@@ -877,6 +878,12 @@ export default function CommunityTab() {
           </div>
         </div>
       )}
+    </div>
+  );
+
+
+      {/* Emama Zinashe Floating AI Assistant */}
+      <EmamaAssistant page="community" />
     </div>
   );
 }

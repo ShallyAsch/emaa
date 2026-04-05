@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
 import { Sparkles } from 'lucide-react';
+import EmamaAssistant from '@/src/components/shared/EmamaAssistant';
 
 // Kuriftu African Village, Bishoftu — verified GPS coordinates
 const KURIFTU_LAT = 8.7503;
@@ -77,6 +78,12 @@ export default function ExploreTab() {
           ))}
         </div>
       </div>
+    </div>
+  );
+
+
+      {/* Emama Zinashe Floating AI Assistant */}
+      <EmamaAssistant page="explore" />
     </div>
   );
 }

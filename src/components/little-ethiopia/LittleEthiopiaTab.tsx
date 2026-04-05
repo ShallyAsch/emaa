@@ -803,4 +803,10 @@ export default function LittleEthiopiaTab() {
       )}
     </div>
   );
+
+
+      {/* Emama Zinashe Floating AI Assistant */}
+      <EmamaAssistant page="little-ethiopia" />
+    </div>
+  );
 }

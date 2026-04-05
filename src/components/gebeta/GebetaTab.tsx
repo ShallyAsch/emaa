@@ -649,7 +649,20 @@ export default function GebetaTab() {
 
       {/* Emama Zinashe Floating AI Assistant */}
       <EmamaAssistant
-        message="Hungry, my dear? I know exactly which dish will warm your heart today. Shall I recommend something special?"
+        page="gebeta"
+        onRecommend={async () => {
+          setAiLoading(true);
+          try {
+            const res = await fetch('/api/ai-chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ type: 'discovery', message: 'Recommend a dish from the menu' }),
+            });
+            const data = await res.json();
+            setAiPick(data);
+          } catch {}
+          setAiLoading(false);
+        }}
       />
     </div>
   );

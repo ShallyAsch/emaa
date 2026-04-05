@@ -125,8 +125,8 @@ const celebrationPackages: CelebrationPackage[] = [
 ];
 
 const meetingHalls: MeetingHall[] = [
-  { id: 'hall1', name: 'Haile Selassie Hall', image: '/dining-hall.jpg', capacity: '200 guests', features: ['WiFi', 'Projector', 'Sound System', 'Stage'], description: 'Our grandest hall, perfect for large conferences and gala events.', pricePerHour: '$150/hour' },
-  { id: 'hall2', name: 'Kwame Nkrumah Hall', image: '/culture-hero.jpg', capacity: '150 guests', features: ['WiFi', 'Projector', 'Sound System', 'Breakout rooms'], description: 'Ideal for corporate retreats and workshops.', pricePerHour: '$120/hour' },
+  { id: 'hall1', name: 'Haile Selassie Hall', image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/photo_6_2026-04-05_22-49-49-xJfbJsF34V1lVlBhFwHQyWbPEhfNiq.jpg', capacity: '200 guests', features: ['WiFi', 'Projector', 'Sound System', 'Stage'], description: 'Our grandest hall, perfect for large conferences and gala events.', pricePerHour: '$150/hour' },
+  { id: 'hall2', name: 'Kwame Nkrumah Hall', image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/photo_7_2026-04-05_22-49-49-o2hZUexeLafcPjuvwkATt8amcJ4LOp.jpg', capacity: '150 guests', features: ['WiFi', 'Projector', 'Sound System', 'Breakout rooms'], description: 'Ideal for corporate retreats and workshops.', pricePerHour: '$120/hour' },
   { id: 'hall3', name: 'Jomo Kenyatta Hall', image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/photo_1_2026-04-05_22-49-49-kK0wmItYngAYsKPXe25v2sDaYMTd0q.jpg', capacity: '100 guests', features: ['WiFi', 'Projector', 'Video conferencing', 'Catering area'], description: 'A versatile space for seminars and training sessions.', pricePerHour: '$100/hour' },
   { id: 'hall4', name: 'Gamal Abdel Nasser Hall', image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/photo_2_2026-04-05_22-49-49-HJIM1AjzVUWLLvWW66NbhVtsWcYjui.jpg', capacity: '95 sqm', features: ['WiFi', 'Smart TV', 'Sound System', 'Recording equipment'], description: 'A serene environment for meaningful exchanges.', pricePerHour: '$80/hour' },
   { id: 'hall5', name: 'Julius Nyerere Hall', image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/photo_3_2026-04-05_22-49-49-kK0wmItYngAYsKPXe25v2sDaYMTd0q.jpg', capacity: '88 sqm', features: ['WiFi', 'Projector', 'Whiteboard', 'Coffee station'], description: 'An intimate space for contemplation and connection.', pricePerHour: '$60/hour' },
@@ -738,6 +738,12 @@ export default function EventsTab() {
           </div>
         </div>
       )}
+    </div>
+  );
+
+
+      {/* Emama Zinashe Floating AI Assistant */}
+      <EmamaAssistant page="events" />
     </div>
   );
 }

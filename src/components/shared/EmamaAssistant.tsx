@@ -1,23 +1,47 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Sparkles } from 'lucide-react';
 
 interface EmamaAssistantProps {
-  message?: string;
+  page: 'gebeta' | 'events' | 'schedule' | 'comfort' | 'explore' | 'community' | 'memory-box' | 'profile' | 'little-ethiopia';
   onRecommend?: () => void;
 }
 
-export default function EmamaAssistant({ message, onRecommend }: EmamaAssistantProps) {
+const pageMessages: Record<string, string> = {
+  gebeta: 'Hungry, my dear? I know exactly which dish will warm your heart today. Shall I recommend something special?',
+  events: 'Looking for something magical to experience tonight? I know just the event that will make your evening unforgettable!',
+  schedule: 'I see you have a busy day! Would you like me to suggest the perfect timing for your activities?',
+  comfort: 'Feeling a bit chilly or too warm? Let me adjust your room for the perfect comfort, my dear.',
+  explore: 'There is so much beauty around Kuriftu! Shall I show you the hidden gems most guests miss?',
+  community: 'I noticed you have so much in common with other guests! Want me to introduce you to someone special?',
+  'memory-box': 'Would you like me to create a beautiful story from all your wonderful moments here?',
+  profile: 'Your profile tells me so much about you! Want me to personalize your entire experience?',
+  'little-ethiopia': 'The traditions here are so rich! Shall I guide you through a cultural experience you will never forget?',
+};
+
+export default function EmamaAssistant({ page, onRecommend }: EmamaAssistantProps) {
   const [showChat, setShowChat] = useState(true);
   const [dismissed, setDismissed] = useState(false);
+  const [showing, setShowing] = useState(false);
 
-  if (dismissed) return null;
+  useEffect(() => {
+    const dismissed = typeof window !== 'undefined' && localStorage.getItem(`emama-dismissed-${page}`);
+    if (dismissed) setDismissed(true);
+    else setTimeout(() => setShowing(true), 2000);
+  }, [page]);
+
+  const handleDismiss = () => {
+    setDismissed(true);
+    if (typeof window !== 'undefined') localStorage.setItem(`emama-dismissed-${page}`, 'true');
+  };
+
+  if (dismissed || !showing) return null;
 
   return (
     <div className="fixed bottom-6 left-6 md:left-28 z-40">
       {showChat && (
-        <div className="absolute bottom-16 left-0 w-80 bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-5 space-y-4 border border-border">
+        <div className="absolute bottom-16 left-0 w-80 bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-5 space-y-4 border border-border animate-in slide-in-from-bottom-2 fade-in">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center text-xl flex-shrink-0">
               👵
@@ -25,7 +49,7 @@ export default function EmamaAssistant({ message, onRecommend }: EmamaAssistantP
             <div>
               <p className="text-sm font-semibold text-primary">Emama Zinashe</p>
               <p className="text-sm text-foreground/80 mt-1">
-                {message || 'Would you like me to recommend the perfect experience for you today?'}
+                {pageMessages[page] || 'How can I make your stay more wonderful today?'}
               </p>
             </div>
           </div>
