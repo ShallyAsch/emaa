@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
-import { MapPin, Star, Clock, Sparkles, ExternalLink } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 // Kuriftu African Village, Bishoftu — verified GPS coordinates
 const KURIFTU_LAT = 8.7503;
@@ -25,56 +25,6 @@ const facilities: Facility[] = [
   { id: '6', title: 'Events & Conference Spaces', description: 'Open-air event areas and indoor meeting rooms for weddings, celebrations, and business functions.', image: '/ethiopian-landscape.jpg' },
 ];
 
-// Leaflet map component (client-only)
-function ResortMap() {
-  const [Loaded, setLoaded] = useState(false);
-  const [LeafletMap, setLeafletMap] = useState<any>(null);
-
-  useEffect(() => {
-    Promise.all([
-      import('react-leaflet'),
-      import('leaflet'),
-    ]).then(([mod, L]) => {
-      // Fix default marker icon
-      delete (L.Icon.Default.prototype as any)._getIconUrl;
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-      });
-      setLeafletMap(mod);
-      setLoaded(true);
-    });
-  }, []);
-
-  if (!Loaded || !LeafletMap) {
-    return <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground text-sm">Loading map...</div>;
-  }
-
-  const { MapContainer, TileLayer, Marker, Popup } = LeafletMap;
-
-  return (
-    <MapContainer
-      center={[KURIFTU_LAT, KURIFTU_LNG]}
-      zoom={20}
-      scrollWheelZoom={true}
-      className="w-full h-full"
-      zoomControl={false}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
-        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-      />
-      <Marker position={[KURIFTU_LAT, KURIFTU_LNG]}>
-        <Popup>
-          <strong>Kuriftu African Village</strong><br />
-          Bishoftu (Debre Zeit), Ethiopia
-        </Popup>
-      </Marker>
-    </MapContainer>
-  );
-}
-
 export default function ExploreTab() {
   return (
     <div className="min-h-screen bg-background">
@@ -89,9 +39,14 @@ export default function ExploreTab() {
       </div>
 
       {/* Satellite Map */}
-      <div className="relative w-full h-[35vh] md:h-[45vh] overflow-hidden border-b border-border">
-        <ResortMap />
-        <div className="absolute bottom-3 left-3 bg-white/90 dark:bg-gray-900/90 backdrop-blur px-2.5 py-1 rounded-md shadow text-xs font-medium text-[#4B3425] z-[1000]">
+      <div className="relative w-full h-[35vh] md:h-[45vh] overflow-hidden">
+        <iframe
+          src={`https://maps.google.com/maps?q=${KURIFTU_LAT},${KURIFTU_LNG}&t=k&z=20&ie=UTF8&iwloc=&output=embed`}
+          width="100%" height="100%" style={{ border: 0 }}
+          allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
+          className="w-full h-full" title="Kuriftu Resort Satellite View"
+        />
+        <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-2.5 py-1 rounded-md shadow text-xs font-medium text-[#4B3425]">
           📍 Kuriftu African Village, Bishoftu
         </div>
       </div>
