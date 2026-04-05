@@ -171,110 +171,6 @@ export default function MyScheduleTab() {
   const totalCount = allActivities.length;
   const progressPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
-  const PreparationModal = ({
-    activity,
-    onClose,
-  }: {
-    activity: ScheduledActivity;
-    onClose: () => void;
-  }) => {
-    if (!activity) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div className="glass rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-          {/* Header with Image */}
-          <div className="relative h-48 w-full">
-            {activity.image && (
-              <Image
-                src={activity.image}
-                alt={activity.title}
-                fill
-                className="object-cover"
-              />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 p-2 bg-white/80 hover:bg-white rounded-full transition-smooth"
-              aria-label="Close modal"
-            >
-              ✕
-            </button>
-          </div>
-
-          <div className="p-8 space-y-8">
-            {/* Title & Time */}
-            <div>
-              <h2 className="font-serif text-3xl font-bold text-primary mb-2">
-                {activity.title}
-              </h2>
-              <div className="flex items-center gap-4 text-foreground/70">
-                <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  <span>{activity.time}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4" />
-                  <span>{activity.location}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* What to Wear */}
-            <div>
-              <h3 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
-                <span>👔</span> What to Wear
-              </h3>
-              <ul className="space-y-3">
-                {activity.whatToWear.map((item, idx) => (
-                  <li key={idx} className="flex gap-3">
-                    <span className="text-accent font-bold">•</span>
-                    <span className="text-foreground/80">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Preparation Tips */}
-            <div>
-              <h3 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
-                <span>✓</span> Preparation Tips
-              </h3>
-              <ul className="space-y-3">
-                {activity.preparation.map((tip, idx) => (
-                  <li key={idx} className="flex gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-foreground/80">{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Learn More Link */}
-            <Link href="/little-ethiopia" className="bg-primary/5 rounded-xl p-5 border border-primary/20 flex items-center justify-between group cursor-pointer hover:bg-primary/10 transition-smooth">
-              <div>
-                <p className="text-sm font-semibold text-primary mb-1">Want to learn more?</p>
-                <p className="text-xs text-muted-foreground">Explore traditions & cultural context</p>
-              </div>
-              <ChevronRight className="w-5 h-5 text-primary group-hover:translate-x-1 transition-transform" />
-            </Link>
-
-            {/* Close */}
-            <button
-              onClick={onClose}
-              className="w-full bg-accent hover:bg-accent/90 text-primary font-semibold py-3 rounded-lg transition-smooth"
-            >
-              Ready to Go!
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-
   return (
     <div className="min-h-screen bg-background">
       {/* No Hero - Start with Content */}
@@ -510,12 +406,46 @@ export default function MyScheduleTab() {
       </div>
 
       {/* Preparation Modal */}
-      {showPreparation && allActivities.find(a => a.id === showPreparation) && (
-        <PreparationModal
-          activity={allActivities.find(a => a.id === showPreparation)!}
-          onClose={() => setShowPreparation(null)}
-        />
-      )}
+      {showPreparation && allActivities.find(a => a.id === showPreparation) && (() => {
+        const activity = allActivities.find(a => a.id === showPreparation)!;
+        return (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div className="glass rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+              <div className="relative h-48 w-full">
+                {activity.image && <Image src={activity.image} alt={activity.title} fill className="object-cover" />}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <button onClick={() => setShowPreparation(null)} className="absolute top-4 right-4 p-2 bg-white/80 hover:bg-white rounded-full transition-smooth" aria-label="Close">✕</button>
+              </div>
+              <div className="p-8 space-y-8">
+                <div>
+                  <h2 className="font-serif text-3xl font-bold text-primary mb-2">{activity.title}</h2>
+                  <div className="flex items-center gap-4 text-foreground/70">
+                    <div className="flex items-center gap-1"><Clock className="w-4 h-4" /><span>{activity.time}</span></div>
+                    <div className="flex items-center gap-1"><MapPin className="w-4 h-4" /><span>{activity.location}</span></div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-primary mb-4">👔 What to Wear</h3>
+                  <ul className="space-y-3">
+                    {activity.whatToWear.map((item, idx) => <li key={idx} className="flex gap-3"><span className="text-accent font-bold">•</span><span className="text-foreground/80">{item}</span></li>)}
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-primary mb-4">✓ Preparation Tips</h3>
+                  <ul className="space-y-3">
+                    {activity.preparation.map((tip, idx) => <li key={idx} className="flex gap-3"><CheckCircle2 className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" /><span className="text-foreground/80">{tip}</span></li>)}
+                  </ul>
+                </div>
+                <Link href="/little-ethiopia" className="bg-primary/5 rounded-xl p-5 border border-primary/20 flex items-center justify-between group cursor-pointer hover:bg-primary/10 transition-smooth">
+                  <div><p className="text-sm font-semibold text-primary mb-1">Want to learn more?</p><p className="text-xs text-muted-foreground">Explore traditions & cultural context</p></div>
+                  <ChevronRight className="w-5 h-5 text-primary group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <button onClick={() => setShowPreparation(null)} className="w-full bg-accent hover:bg-accent/90 text-primary font-semibold py-3 rounded-lg transition-smooth">Ready to Go!</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
