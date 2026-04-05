@@ -878,10 +878,6 @@ export default function CommunityTab() {
           </div>
         </div>
       )}
-    </div>
-  );
-
-
       {/* Emama Zinashe Floating AI Assistant */}
       <EmamaAssistant page="community" />
     </div>

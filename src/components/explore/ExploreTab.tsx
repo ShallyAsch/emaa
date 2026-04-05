@@ -83,10 +83,6 @@ export default function ExploreTab() {
           ))}
         </div>
       </div>
-    </div>
-  );
-
-
       {/* Emama Zinashe Floating AI Assistant */}
       <EmamaAssistant page="explore" />
     </div>

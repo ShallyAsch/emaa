@@ -467,10 +467,6 @@ export default function ComfortTab() {
         </div>
 
       </div>
-    </div>
-  );
-
-
       {/* Emama Zinashe Floating AI Assistant */}
       <EmamaAssistant page="comfort" />
     </div>

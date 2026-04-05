@@ -511,9 +511,6 @@ export default function MyScheduleTab() {
           </div>
         );
       })()}
-    </div>
-  );
-
 
       {/* Emama Zinashe Floating AI Assistant */}
       <EmamaAssistant page="schedule" />

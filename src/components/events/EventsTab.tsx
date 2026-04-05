@@ -738,10 +738,6 @@ export default function EventsTab() {
           </div>
         </div>
       )}
-    </div>
-  );
-
-
       {/* Emama Zinashe Floating AI Assistant */}
       <EmamaAssistant page="events" />
     </div>
