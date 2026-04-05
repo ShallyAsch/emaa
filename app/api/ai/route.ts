@@ -65,7 +65,7 @@ function analyzeWithKeywords(text: string, settings?: AIRequestBody['settings'])
       actions: [{ type: 'set_lighting', value: 'night', label: 'Set to Night Lighting', icon: '🕯️' }],
     };
   }
-  if (/\b(bright|read|work|study|see|focus)\b/.test(lower)) {
+  if (/\b(bright|read|light|see|focus|lamp)\b/.test(lower)) {
     return {
       mood: 'relaxed', intent: 'change_lighting', confidence: 0.80,
       message: "Of course! I've set the room to day lighting so you can see better.",
@@ -95,6 +95,15 @@ function analyzeWithKeywords(text: string, settings?: AIRequestBody['settings'])
       mood: 'happy', intent: 'general_chat', confidence: 0.80,
       message: "Our restaurant serves authentic Ethiopian cuisine — from Doro Wat to Kitfo and fresh Beyaynetu. The Buna ceremony is a must-try! Head to Gebeta to see the full menu and reserve your table.",
       actions: [],
+    };
+  }
+
+  // === WORK / STUDY ===
+  if (/\b(work|study|office|desk|laptop|computer|business|meeting|print)\b/.test(lower)) {
+    return {
+      mood: 'relaxed', intent: 'general_chat', confidence: 0.75,
+      message: "We have a quiet workspace in the lobby with free WiFi and power outlets. The garden area is also lovely for reading or working — just ask for a table setup and we'll bring you some coffee!",
+      actions: [{ type: 'set_lighting', value: 'day', label: 'Brighten Room for Work', icon: '💡' }],
     };
   }
 
@@ -287,7 +296,7 @@ Rules:
   const timeoutId = setTimeout(() => controller.abort(), 15000);
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -341,21 +350,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message must be under 2000 characters' }, { status: 400 });
     }
 
-    const apiKey = process.env.GOOGLE_API_KEY || 'AIzaSyDAJxhzdkk7orPJkVGXfQaDywtwO4NKhHQ';
+    const apiKey = process.env.GOOGLE_API_KEY;
 
     let result: AIResponsePayload;
 
+    // Try Gemini AI first
     if (apiKey) {
       try {
         result = await analyzeWithGemini(body.message, body.settings, body.context, apiKey);
       } catch (aiError) {
-        console.error('Gemini API call failed, falling back to keyword matching:', aiError);
+        // Gemini failed — use keyword result as fallback
+        console.warn('Gemini API unavailable, using keyword analysis');
         result = analyzeWithKeywords(body.message, body.settings);
-        result.reasoning = 'Fallback: Gemini API failed, used keyword matching';
+        result.reasoning = 'Fallback: Gemini API unavailable, used keyword matching';
       }
     } else {
+      // No API key — use keywords
       result = analyzeWithKeywords(body.message, body.settings);
-      result.reasoning = 'No GOOGLE_API_KEY configured, used keyword matching';
+      result.reasoning = 'No GOOGLE_API_KEY, used keyword matching';
     }
 
     return NextResponse.json(result);

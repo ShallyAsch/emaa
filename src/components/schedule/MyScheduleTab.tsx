@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { Clock, MapPin, CheckCircle2, Heart, ChevronRight, AlertCircle } from 'lucide-react';
-import { mockGuest } from '@/src/lib/mockData';
+import { useUser } from '@clerk/nextjs';
+import { Clock, MapPin, CheckCircle2, ChevronRight, AlertCircle, Square, CheckSquare } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface ScheduledActivity {
   id: string;
@@ -15,9 +16,19 @@ interface ScheduledActivity {
   preparation: string[];
   image?: string;
   completed?: boolean;
+  fromBooking?: boolean;
 }
 
-const mockScheduledActivities: ScheduledActivity[] = [
+interface BookedEvent {
+  id: string;
+  title: string;
+  time: string;
+  description: string;
+  image: string;
+  type: string;
+}
+
+const defaultActivities: ScheduledActivity[] = [
   {
     id: '1',
     time: '10:00 AM',
@@ -31,7 +42,7 @@ const mockScheduledActivities: ScheduledActivity[] = [
       'Remove any strong perfumes (respect the aroma)',
     ],
     image: '/buna-ceremony.jpg',
-    completed: true,
+    completed: false,
   },
   {
     id: '2',
@@ -39,18 +50,15 @@ const mockScheduledActivities: ScheduledActivity[] = [
     title: 'Traditional Weaving Workshop',
     location: 'Artisan Studio',
     description: 'Learn to weave a traditional mesob basket',
-    whatToWear: [
-      'Casual, comfortable clothing',
-      'Closed-toe shoes',
-      'Avoid loose sleeves',
-    ],
+    whatToWear: ['Casual, comfortable clothing', 'Closed-toe shoes', 'Avoid loose sleeves'],
     preparation: [
       'Bring water bottle',
       'Trim nails for safety',
       'Come with an open mind and patience',
+      'Be ready to learn traditional patterns passed down through generations',
     ],
     image: '/culture-hero.jpg',
-    completed: true,
+    completed: false,
   },
   {
     id: '3',
@@ -69,22 +77,99 @@ const mockScheduledActivities: ScheduledActivity[] = [
   },
 ];
 
-const upcomingIn30Minutes = mockScheduledActivities[2];
-
 export default function MyScheduleTab() {
+  const { user, isLoaded } = useUser();
+  const displayName = isLoaded ? (user?.firstName || user?.username || 'Guest') : 'Guest';
   const [showPreparation, setShowPreparation] = useState<string | null>(null);
-  const [timeRemaining, setTimeRemaining] = useState(28);
+  const [allActivities, setAllActivities] = useState<ScheduledActivity[]>(defaultActivities);
+  const [checkedActivities, setCheckedActivities] = useState<Set<string>>(new Set());
 
+  // Load booked events + progress from Turso DB
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeRemaining((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 60000); // Update every minute
-    return () => clearInterval(timer);
-  }, []);
+    if (!user?.id) return;
+    fetch('/api/schedule')
+      .then(r => r.json())
+      .then(data => {
+        if (data.completedActivities) setCheckedActivities(new Set(data.completedActivities));
+        if (data.events && data.events.length > 0) {
+          const bookedActivities: ScheduledActivity[] = data.events.map((ev: any) => ({
+            id: `booked-${ev.id}`,
+            time: ev.time,
+            title: ev.title,
+            location: 'Main Venue',
+            description: '',
+            whatToWear: ['Comfortable clothing'],
+            preparation: ['Arrive 10 minutes early'],
+            image: ev.image,
+            completed: false,
+            fromBooking: true,
+          }));
+          setAllActivities(prev => {
+            const ids = new Set(prev.map(a => a.id));
+            const newActs = bookedActivities.filter(a => !ids.has(a.id));
+            return [...prev, ...newActs];
+          });
+        }
+      })
+      .catch(() => {});
+  }, [user?.id]);
 
-  const completedCount = mockScheduledActivities.filter((a) => a.completed).length;
-  const totalCount = mockScheduledActivities.length;
-  const progressPercentage = (completedCount / totalCount) * 100;
+  // Save progress to Turso DB
+  const toggleCheck = useCallback((id: string) => {
+    setCheckedActivities(prev => {
+      const wasChecked = prev.has(id);
+      const next = new Set(prev);
+      wasChecked ? next.delete(id) : next.add(id);
+
+      // Persist to DB
+      if (user?.id) {
+        fetch('/api/schedule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'progress', activityId: id, completed: !wasChecked }),
+        }).catch(() => {});
+      }
+      return next;
+    });
+  }, [user?.id]);
+
+  // Calculate upcoming activity based on current time
+  const getUpcomingActivity = useCallback(() => {
+    const now = new Date();
+    const sorted = [...allActivities].sort((a, b) => {
+      const parseTime = (t: string) => {
+        const [time, ampm] = t.split(' ');
+        let [h, m] = time.split(':').map(Number);
+        if (ampm === 'PM' && h !== 12) h += 12;
+        if (ampm === 'AM' && h === 12) h = 0;
+        return h * 60 + m;
+      };
+      return parseTime(a.time) - parseTime(b.time);
+    });
+
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    for (const activity of sorted) {
+      const parseTime = (t: string) => {
+        const [time, ampm] = t.split(' ');
+        let [h, m] = time.split(':').map(Number);
+        if (ampm === 'PM' && h !== 12) h += 12;
+        if (ampm === 'AM' && h === 12) h = 0;
+        return h * 60 + m;
+      };
+      const actMin = parseTime(activity.time);
+      if (actMin >= currentMinutes) {
+        const diff = actMin - currentMinutes;
+        return { activity, minutesUntil: diff };
+      }
+    }
+    return null;
+  }, [allActivities]);
+
+  const upcoming = getUpcomingActivity();
+
+  const completedCount = allActivities.filter(a => checkedActivities.has(a.id)).length;
+  const totalCount = allActivities.length;
+  const progressPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
   const PreparationModal = ({
     activity,
@@ -181,13 +266,14 @@ export default function MyScheduleTab() {
               onClick={onClose}
               className="w-full bg-accent hover:bg-accent/90 text-primary font-semibold py-3 rounded-lg transition-smooth"
             >
-              Ready to Go! ❤️
+              Ready to Go!
             </button>
           </div>
         </div>
       </div>
     );
   };
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -196,13 +282,13 @@ export default function MyScheduleTab() {
         {/* Personal Greeting */}
         <div className="space-y-4">
           <h1 className="font-serif text-4xl md:text-5xl font-bold text-primary">
-            My Schedule
+            Events You Registered To:
           </h1>
           <p className="text-lg text-foreground/70">
-            Here&apos;s what&apos;s waiting for you today, {mockGuest.name} ❤️
+            Here&apos;s what&apos;s waiting for you today, {displayName}
           </p>
           <p className="text-sm text-muted-foreground">
-            These moments are waiting just for you
+            Check off activities as you complete them
           </p>
         </div>
 
@@ -226,136 +312,173 @@ export default function MyScheduleTab() {
 
         {/* Scheduled Activities Timeline */}
         <section className="space-y-4">
-          <h2 className="text-lg font-semibold text-primary">Chronological Timeline</h2>
+          <h2 className="text-lg font-semibold text-primary">Your Schedule</h2>
 
-          {mockScheduledActivities.map((activity) => (
-            <div
-              key={activity.id}
-              className={`glass rounded-2xl overflow-hidden shadow-warm hover:shadow-warm-lg transition-all group ${
-                activity.completed ? 'opacity-75' : ''
-              }`}
-            >
-              <div className="p-6 md:p-8">
-                <div className="flex flex-col md:flex-row gap-6">
-                  {/* Time Card */}
-                  <div className="flex-shrink-0">
-                    <div className="bg-gradient-to-br from-accent/20 to-secondary/20 rounded-2xl px-5 py-4 text-center border border-accent/30">
-                      <div className="font-bold text-2xl text-accent">
-                        {activity.time.split(' ')[0]}
-                      </div>
-                      <div className="text-xs text-primary uppercase font-semibold tracking-wide">
-                        {activity.time.split(' ')[1]}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Activity Details */}
-                  <div className="flex-1">
-                    <div className="flex items-start gap-3 mb-3">
-                      {activity.completed && (
-                        <CheckCircle2 className="w-6 h-6 text-secondary flex-shrink-0 mt-1" />
+          {allActivities.map((activity) => {
+            const isChecked = checkedActivities.has(activity.id);
+            
+            return (
+              <div
+                key={activity.id}
+                className={`glass rounded-2xl overflow-hidden shadow-warm hover:shadow-warm-lg transition-all group ${
+                  isChecked ? 'opacity-75' : ''
+                }`}
+              >
+                <div className="p-6 md:p-8">
+                  <div className="flex flex-col md:flex-row gap-6">
+                    {/* Checkbox */}
+                    <button
+                      onClick={() => toggleCheck(activity.id)}
+                      className="flex-shrink-0 self-start"
+                      aria-label={isChecked ? 'Mark as incomplete' : 'Mark as complete'}
+                    >
+                      {isChecked ? (
+                        <CheckSquare className="w-7 h-7 text-secondary" />
+                      ) : (
+                        <Square className="w-7 h-7 text-muted-foreground hover:text-secondary transition-colors" />
                       )}
-                      <div className="flex-1">
-                        <h3 className={`font-semibold text-xl mb-2 ${
-                          activity.completed ? 'line-through text-muted-foreground' : 'text-primary'
-                        }`}>
-                          {activity.title}
-                        </h3>
-                        <div className="flex items-center gap-2 text-sm text-foreground/70">
-                          <MapPin className="w-4 h-4 text-secondary" />
-                          <span>{activity.location}</span>
+                    </button>
+
+                    {/* Time Card */}
+                    <div className="flex-shrink-0">
+                      <div className="bg-gradient-to-br from-accent/20 to-secondary/20 rounded-2xl px-5 py-4 text-center border border-accent/30">
+                        <div className="font-bold text-2xl text-accent">
+                          {activity.time.split(' ')[0]}
+                        </div>
+                        <div className="text-xs text-primary uppercase font-semibold tracking-wide">
+                          {activity.time.split(' ')[1]}
                         </div>
                       </div>
                     </div>
 
-                    <p className="text-foreground/70 mb-4 line-clamp-2">
-                      {activity.description}
-                    </p>
 
-                    {!activity.completed && (
-                      <button
-                        onClick={() => setShowPreparation(activity.id)}
-                        className="inline-flex items-center gap-2 bg-accent hover:bg-accent/90 text-primary font-semibold px-5 py-2 rounded-lg transition-smooth group/btn"
-                      >
-                        Help Me Prepare
-                        <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                      </button>
-                    )}
-                  </div>
+                    {/* Activity Details */}
+                    <div className="flex-1">
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className={`font-semibold text-xl mb-2 ${
+                              isChecked ? 'line-through text-muted-foreground' : 'text-primary'
+                            }`}>
+                              {activity.title}
+                            </h3>
+                            {activity.fromBooking && (
+                              <span className="text-xs bg-accent/20 text-accent px-2 py-0.5 rounded-full">
+                                Booked
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-foreground/70">
+                            <MapPin className="w-4 h-4 text-secondary" />
+                            <span>{activity.location}</span>
+                          </div>
+                        </div>
+                      </div>
 
-                  {/* Image */}
-                  {activity.image && (
-                    <div className="relative h-32 w-full md:w-32 rounded-xl overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform">
-                      <Image
-                        src={activity.image}
-                        alt={activity.title}
-                        fill
-                        className="object-cover"
-                      />
-                      {activity.completed && (
-                        <div className="absolute inset-0 bg-black/30" />
+                      <p className="text-foreground/70 mb-4 line-clamp-2">
+                        {activity.description}
+                      </p>
+
+                      {!isChecked && (
+                        <button
+                          onClick={() => setShowPreparation(activity.id)}
+                          className="inline-flex items-center gap-2 bg-accent hover:bg-accent/90 text-primary font-semibold px-5 py-2 rounded-lg transition-smooth group/btn"
+                        >
+                          Help Me Prepare
+                          <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                        </button>
                       )}
                     </div>
-                  )}
+
+                    {/* Image */}
+                    {activity.image && (
+                      <div className="relative h-32 w-full md:w-32 rounded-xl overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform">
+                        <Image
+                          src={activity.image}
+                          alt={activity.title}
+                          fill
+                          className="object-cover"
+                        />
+                        {isChecked && (
+                          <div className="absolute inset-0 bg-black/30" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </section>
+
+        {/* Upcoming Activity - Dynamic Section */}
+        {upcoming && upcoming.minutesUntil <= 300 && (
+          <section className="space-y-4">
+            <h2 className="text-lg font-semibold text-primary flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-accent" />
+              Upcoming in {upcoming.minutesUntil} Minutes
+            </h2>
+
+            <div className="glass rounded-3xl p-8 md:p-10 border-l-4 border-accent shadow-warm-lg hover:shadow-warm-xl transition-all">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                {upcoming.activity.image && (
+                  <div className="relative h-48 rounded-2xl overflow-hidden">
+                    <Image
+                      src={upcoming.activity.image}
+                      alt={upcoming.activity.title}
+                      fill
+                      className="object-cover hover:scale-105 transition-transform"
+                    />
+                  </div>
+                )}
+                <div className="md:col-span-2 space-y-4">
+                  <div>
+                    <h3 className="font-serif text-2xl font-bold text-primary mb-2">
+                      {upcoming.activity.title}
+                    </h3>
+                    <div className="flex flex-col gap-2 text-foreground/70">
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-accent" />
+                        <span>Starting at {upcoming.activity.time}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-accent" />
+                        <span>{upcoming.activity.location}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-end gap-4">
+                    <div>
+                      <div className="text-sm text-muted-foreground mb-1">Time until start</div>
+                      <div className="text-5xl font-bold text-accent">{upcoming.minutesUntil}m</div>
+                    </div>
+                    <Button
+                      onClick={() => setShowPreparation(upcoming.activity.id)}
+                      className="flex-1 bg-accent hover:bg-accent/90 text-primary font-bold px-6 py-3 rounded-xl text-lg"
+                    >
+                      Help Me Prepare!
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
-          ))}
-        </section>
+          </section>
+        )}
 
-        {/* Upcoming in 30 Minutes - Prominent Section */}
-        <section className="space-y-4">
-          <h2 className="text-lg font-semibold text-primary flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-accent" />
-            Upcoming in {timeRemaining} Minutes
-          </h2>
-
-          <div className="glass rounded-3xl p-8 md:p-10 border-l-4 border-accent shadow-warm-lg hover:shadow-warm-xl transition-all">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-              {/* Image */}
-              {upcomingIn30Minutes.image && (
-                <div className="relative h-48 rounded-2xl overflow-hidden">
-                  <Image
-                    src={upcomingIn30Minutes.image}
-                    alt={upcomingIn30Minutes.title}
-                    fill
-                    className="object-cover hover:scale-105 transition-transform"
-                  />
-                </div>
-              )}
-
-              {/* Details */}
-              <div className="md:col-span-2 space-y-4">
-                <div>
-                  <h3 className="font-serif text-2xl font-bold text-primary mb-2">
-                    {upcomingIn30Minutes.title}
-                  </h3>
-                  <div className="flex flex-col gap-2 text-foreground/70">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-accent" />
-                      <span>Starting at {upcomingIn30Minutes.time}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-accent" />
-                      <span>{upcomingIn30Minutes.location}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-end gap-4">
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-1">Time until start</div>
-                    <div className="text-5xl font-bold text-accent">{timeRemaining}m</div>
-                  </div>
-                  <button
-                    onClick={() => setShowPreparation(upcomingIn30Minutes.id)}
-                    className="flex-1 bg-accent hover:bg-accent/90 text-primary font-bold px-6 py-3 rounded-xl transition-smooth text-lg flex items-center justify-center gap-2 group"
-                  >
-                    Help Me Prepare!
-                    <Heart className="w-5 h-5 group-hover:fill-primary transition-smooth" />
-                  </button>
-                </div>
-              </div>
+        {/* Emama Suggestions */}
+        <section className="bg-gradient-to-r from-accent/10 to-secondary/10 rounded-2xl p-6 border border-accent/20">
+          <h3 className="font-serif text-xl font-bold text-primary mb-4">Emama&apos;s Suggestions</h3>
+          <p className="text-foreground/70 mb-4">
+            Based on your schedule, Emama recommends these activities to complement your day:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white/50 rounded-xl p-4 border border-border">
+              <h4 className="font-semibold text-primary mb-1">Sunset Walk</h4>
+              <p className="text-sm text-muted-foreground">Perfect after the Welcome Feast at 7:00 PM</p>
+            </div>
+            <div className="bg-white/50 rounded-xl p-4 border border-border">
+              <h4 className="font-semibold text-primary mb-1">Morning Meditation</h4>
+              <p className="text-sm text-muted-foreground">Start tomorrow refreshed at 6:30 AM</p>
             </div>
           </div>
         </section>
@@ -377,10 +500,11 @@ export default function MyScheduleTab() {
           </button>
         </section>
 
+
         {/* Emotional Closing Message */}
         <div className="bg-gradient-to-r from-secondary/10 to-accent/10 rounded-2xl p-8 text-center border border-secondary/20">
           <p className="text-foreground/80 leading-relaxed italic">
-            Every moment on your schedule has been thoughtfully curated. These are not just activities—they&apos;re invitations into our culture, our family, and your home away from home. Enjoy every second. ❤️
+            Every moment on your schedule has been thoughtfully curated. These are not just activities—they&apos;re invitations into our culture, our family, and your home away from home. Enjoy every second.
           </p>
         </div>
       </div>
@@ -389,7 +513,7 @@ export default function MyScheduleTab() {
       {showPreparation && (
         <PreparationModal
           activity={
-            mockScheduledActivities.find((a) => a.id === showPreparation)!
+            allActivities.find((a) => a.id === showPreparation)!
           }
           onClose={() => setShowPreparation(null)}
         />
@@ -397,3 +521,6 @@ export default function MyScheduleTab() {
     </div>
   );
 }
+
+
+

@@ -44,8 +44,29 @@ export async function initDb() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
+    `CREATE TABLE IF NOT EXISTS booked_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      clerk_id TEXT NOT NULL,
+      event_id TEXT NOT NULL,
+      event_title TEXT,
+      event_time TEXT,
+      event_type TEXT,
+      event_image TEXT,
+      booked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(clerk_id, event_id)
+    )`,
+    `CREATE TABLE IF NOT EXISTS schedule_progress (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      clerk_id TEXT NOT NULL,
+      activity_id TEXT NOT NULL,
+      completed INTEGER DEFAULT 0,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(clerk_id, activity_id)
+    )`,
     `CREATE INDEX IF NOT EXISTS idx_users_clerk_id ON users(clerk_id)`,
     `CREATE INDEX IF NOT EXISTS idx_prefs_clerk_id ON user_preferences(clerk_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_bookings_clerk ON booked_events(clerk_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_schedule_clerk ON schedule_progress(clerk_id)`,
   ]);
   dbInitialized = true;
 }
@@ -163,6 +184,62 @@ export async function getPreferences(clerk_id: string) {
     coffee_preference: row.coffee_preference as string | null,
     special_moments: JSON.parse((row.special_moments as string) || '[]') as string[],
   };
+}
+
+// === Schedule & Bookings ===
+
+export async function bookEvent(clerk_id: string, event: {
+  event_id: string;
+  event_title: string;
+  event_time: string;
+  event_type: string;
+  event_image: string;
+}) {
+  const database = getDb();
+  await database.execute({
+    sql: `INSERT OR IGNORE INTO booked_events (clerk_id, event_id, event_title, event_time, event_type, event_image)
+          VALUES (?, ?, ?, ?, ?, ?)`,
+    args: [clerk_id, event.event_id, event.event_title, event.event_time, event.event_type, event.event_image],
+  });
+}
+
+export async function getBookedEvents(clerk_id: string) {
+  const database = getDb();
+  const result = await database.execute({
+    sql: 'SELECT * FROM booked_events WHERE clerk_id = ? ORDER BY booked_at DESC',
+    args: [clerk_id],
+  });
+  return result.rows.map(row => ({
+    id: row.event_id as string,
+    title: row.event_title as string,
+    time: row.event_time as string,
+    type: row.event_type as string,
+    image: row.event_image as string,
+  }));
+}
+
+export async function toggleScheduleProgress(clerk_id: string, activity_id: string, completed: boolean) {
+  const database = getDb();
+  await database.execute({
+    sql: `INSERT INTO schedule_progress (clerk_id, activity_id, completed)
+          VALUES (?, ?, ?)
+          ON CONFLICT(clerk_id, activity_id) DO UPDATE SET
+            completed = ?, updated_at = CURRENT_TIMESTAMP`,
+    args: [clerk_id, activity_id, completed ? 1 : 0, completed ? 1 : 0],
+  });
+}
+
+export async function getScheduleProgress(clerk_id: string) {
+  const database = getDb();
+  const result = await database.execute({
+    sql: 'SELECT activity_id, completed FROM schedule_progress WHERE clerk_id = ?',
+    args: [clerk_id],
+  });
+  const completed = new Set<string>();
+  result.rows.forEach(row => {
+    if ((row.completed as number) === 1) completed.add(row.activity_id as string);
+  });
+  return completed;
 }
 
 export default getDb;

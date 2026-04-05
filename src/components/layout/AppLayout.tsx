@@ -21,6 +21,7 @@ import {
   User,
   LogIn,
   UserPlus,
+  Users,
 } from 'lucide-react';
 import { mockResort } from '@/src/lib/mockData';
 import EmamaChatWidget from '@/src/components/home/EmamaChatWidget';
@@ -85,6 +86,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     { href: '/comfort', label: 'Comfort', icon: Wind },
     { href: '/little-ethiopia', label: 'Little Ethiopia', icon: Palette },
     { href: '/events', label: 'Events', icon: Images },
+    { href: '/community', label: 'Community', icon: Users },
     { href: '/profile', label: 'Profile', icon: User },
   ];
 

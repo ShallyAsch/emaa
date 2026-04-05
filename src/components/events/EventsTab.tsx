@@ -6,6 +6,15 @@ import { ChevronRight, Share2, Bell, Heart, Zap } from 'lucide-react';
 import ExperienceModal from '@/src/components/shared/ExperienceModal';
 import { mockActivities } from '@/src/lib/mockData';
 
+interface BookedEvent {
+  id: string;
+  title: string;
+  time: string;
+  description: string;
+  image: string;
+  type: string;
+}
+
 export default function EventsTab() {
   const [selectedEvent, setSelectedEvent] = useState<(typeof mockActivities)[0] | null>(null);
   const [selectedModal, setSelectedModal] = useState<'event' | null>(null);
@@ -44,7 +53,38 @@ export default function EventsTab() {
     });
   };
 
-  const handleTertTert = (event: typeof mockActivities[0]) => {
+  const bookEvent = (event: typeof mockActivities[0]) => {
+    const booked: BookedEvent = {
+      id: event.id,
+      title: event.title,
+      time: event.time,
+      description: event.description,
+      image: event.image || '/culture-hero.jpg',
+      type: event.type,
+    };
+
+    // Save to Turso DB
+    fetch('/api/schedule', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'book',
+        event: {
+          event_id: event.id,
+          event_title: event.title,
+          event_time: event.time,
+          event_type: event.type,
+          event_image: event.image || '/culture-hero.jpg',
+        },
+      }),
+    }).catch(() => {});
+
+    // Also save to localStorage as fallback
+    const existing = JSON.parse(localStorage.getItem('bookedEvents') || '[]') as BookedEvent[];
+    if (!existing.find(e => e.id === event.id)) {
+      localStorage.setItem('bookedEvents', JSON.stringify([...existing, booked]));
+    }
+
     setSelectedEvent(event);
     setSelectedModal('event');
   };
@@ -188,7 +228,7 @@ export default function EventsTab() {
                     <div className="flex gap-2 pt-2">
                       {isCultural ? (
                         <button
-                          onClick={() => handleTertTert(event)}
+                          onClick={() => bookEvent(event)}
                           className="flex-1 bg-accent hover:bg-accent/90 text-primary font-semibold py-2 rounded-lg transition-smooth text-sm flex items-center justify-center gap-2 group/btn"
                         >
                           Tert Tert
@@ -196,7 +236,7 @@ export default function EventsTab() {
                         </button>
                       ) : (
                         <button
-                          onClick={() => handleTertTert(event)}
+                          onClick={() => bookEvent(event)}
                           className="flex-1 bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-2 rounded-lg transition-smooth text-sm flex items-center justify-center gap-2 group/btn"
                         >
                           Reserve
