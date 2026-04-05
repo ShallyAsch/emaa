@@ -176,19 +176,23 @@ export default function LittleEthiopiaTab() {
 
   const filters: FilterType[] = ['All', 'Ceremonies', 'Games', 'Stories', 'Dining', 'Music'];
 
-  const aiRecommended = allExperiences.filter((exp) => aiRecommendedIds.includes(exp.id));
+  const matchesSearch = (exp: CulturalExperience) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return exp.title.toLowerCase().includes(q) ||
+           exp.type.toLowerCase().includes(q) ||
+           exp.description.toLowerCase().includes(q) ||
+           exp.shortDescription.toLowerCase().includes(q) ||
+           exp.location.toLowerCase().includes(q);
+  };
 
-  const filteredExperiences = allExperiences.filter((exp) => {
-    const matchesFilter = filterMapping[activeFilter].includes(exp.type);
-    const matchesSearch =
-      searchQuery === '' ||
-      exp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      exp.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      exp.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      exp.shortDescription.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      exp.location.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
+  const aiRecommended = allExperiences.filter((exp) =>
+    aiRecommendedIds.includes(exp.id) && matchesSearch(exp) && filterMapping[activeFilter].includes(exp.type)
+  );
+
+  const filteredExperiences = allExperiences.filter((exp) =>
+    !aiRecommendedIds.includes(exp.id) && filterMapping[activeFilter].includes(exp.type) && matchesSearch(exp)
+  );
 
   const toggleSave = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
