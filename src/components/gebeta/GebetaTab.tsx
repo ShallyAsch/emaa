@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Heart, Sparkles, Flame, Leaf, Star, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import EmamaAssistant from '@/src/components/shared/EmamaAssistant';
+import EmamaResultDisplay from '@/src/components/shared/EmamaResultDisplay';
 
 interface FoodItem {
   id: string;
@@ -285,6 +286,7 @@ export default function GebetaTab() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [aiPick, setAiPick] = useState<{ reasoning: string; activity: { name: string }; meal: { name: string } } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [showResult, setShowResult] = useState(false);
 
   const fetchAiPick = async () => {
     setAiLoading(true);
@@ -650,21 +652,25 @@ export default function GebetaTab() {
       {/* Emama Zinashe Floating AI Assistant */}
       <EmamaAssistant
         page="gebeta"
-        onRecommend={async () => {
-          setAiLoading(true);
-          try {
-            const res = await fetch('/api/ai-chat', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ type: 'discovery', message: 'Recommend a dish from the menu' }),
-            });
-            const data = await res.json();
-            setAiPick(data);
-          } catch {}
-          setAiLoading(false);
-        }}
+        onRecommend={() => setShowResult(true)}}
       />
     </div>
   );
-}
 
+
+      {/* Emama Result Display */}
+      {showResult && (
+        <EmamaResultDisplay
+          title="Dishes for Your Soul"
+          message="I know exactly what will warm your heart today!"
+          items={[
+            { icon: '🥘', label: 'Doro Wat', description: 'Spicy chicken stew, slow-cooked with berbere' },
+            { icon: '🥩', label: 'Tibs Firfir', description: 'Sautéed beef with injera, peppers and onions' },
+            { icon: '☕', label: 'Traditional Buna', description: 'Freshly roasted coffee ceremony experience' },
+          ]}
+          onClose={() => setShowResult(false)}
+        />
+      )}
+    </div>
+  );
+}

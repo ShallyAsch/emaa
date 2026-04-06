@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
 import { Sparkles } from 'lucide-react';
 import EmamaAssistant from '@/src/components/shared/EmamaAssistant';
+import EmamaResultDisplay from '@/src/components/shared/EmamaResultDisplay';
 
 // Kuriftu African Village, Bishoftu — verified GPS coordinates
 const KURIFTU_LAT = 8.7503;
@@ -27,6 +28,7 @@ const facilities: Facility[] = [
 ];
 
 export default function ExploreTab() {
+  const [showResult, setShowResult] = useState(false);
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -86,10 +88,25 @@ export default function ExploreTab() {
       {/* Emama Zinashe Floating AI Assistant */}
       <EmamaAssistant
         page="explore"
-        onRecommend={() => {
-          window.scrollTo({ top: 500, behavior: 'smooth' });
-        }}
+        onRecommend={() => setShowResult(true)}
       />
+    </div>
+  );
+
+
+      {/* Emama Result Display */}
+      {showResult && (
+        <EmamaResultDisplay
+          title="Hidden Gems Around Kuriftu"
+          message="These are the special places most guests miss, my dear!"
+          items={[
+            { icon: '🌅', label: 'Sunset Viewpoint', description: 'Best views from the eastern terrace at 5:30 PM' },
+            { icon: '🌿', label: 'Secret Garden Path', description: 'Quiet walkway behind the spa with herb gardens' },
+            { icon: '☕', label: 'Traditional Coffee Corner', description: 'Hidden spot near the pool for fresh buna' },
+          ]}
+          onClose={() => setShowResult(false)}
+        />
+      )}
     </div>
   );
 }

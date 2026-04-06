@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
 import { Clock, MapPin, CheckCircle2, ChevronRight, AlertCircle, Square, CheckSquare, Sparkles } from 'lucide-react';
 import EmamaAssistant from '@/src/components/shared/EmamaAssistant';
+import EmamaResultDisplay from '@/src/components/shared/EmamaResultDisplay';
 import { Button } from '@/components/ui/button';
 
 interface ScheduledActivity {
@@ -86,6 +87,7 @@ export default function MyScheduleTab() {
   const [allActivities, setAllActivities] = useState<ScheduledActivity[]>(defaultActivities);
   const [checkedActivities, setCheckedActivities] = useState<Set<string>>(new Set());
   const [addingActivities, setAddingActivities] = useState(false);
+  const [showResult, setShowResult] = useState(false);
 
   // Load booked events from localStorage (always) + Turso DB (if logged in)
   useEffect(() => {
@@ -515,30 +517,25 @@ export default function MyScheduleTab() {
       {/* Emama Zinashe Floating AI Assistant */}
       <EmamaAssistant
         page="schedule"
-        onRecommend={async () => {
-          try {
-            const res = await fetch('/api/ai-chat', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ type: 'discovery', message: 'Suggest 2 activities for a resort schedule' }),
-            });
-            const data = await res.json();
-            const newActivity = {
-              id: `ai-${Date.now()}`,
-              time: '3:00 PM',
-              title: data.activity?.name || 'Cultural Experience',
-              location: 'Resort Venue',
-              description: data.reasoning || 'Curated by Emama',
-              whatToWear: ['Comfortable clothing'],
-              preparation: ['Arrive 10 minutes early'],
-              image: '/culture-hero.jpg',
-              completed: false,
-              fromBooking: false,
-            };
-            setAllActivities(prev => [...prev, newActivity]);
-          } catch {}
-        }}
+        onRecommend={() => setShowResult(true)}}
       />
+    </div>
+  );
+
+
+      {/* Emama Result Display */}
+      {showResult && (
+        <EmamaResultDisplay
+          title="Activities for Your Perfect Day"
+          message="I have found the most wonderful experiences for you!"
+          items={[
+            { icon: '☕', label: 'Coffee Ceremony - 10:00 AM', description: 'Traditional Ethiopian coffee at Garden Pavilion' },
+            { icon: '🎲', label: 'Gebeta Game - 2:00 PM', description: 'Ancient strategy game with fellow guests' },
+            { icon: '🌅', label: 'Sunset Walk - 5:30 PM', description: 'Scenic walk around the resort grounds' },
+          ]}
+          onClose={() => setShowResult(false)}
+        />
+      )}
     </div>
   );
 }

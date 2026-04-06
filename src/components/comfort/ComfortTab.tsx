@@ -1,5 +1,6 @@
 'use client';
 import EmamaAssistant from '@/src/components/shared/EmamaAssistant';
+import EmamaResultDisplay from '@/src/components/shared/EmamaResultDisplay';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, AlertCircle, Sun, Moon, Sunset, Lightbulb, User } from 'lucide-react';
@@ -41,6 +42,7 @@ export default function ComfortTab() {
   const [temperature, setTemperature] = useState(22);
   const [lighting, setLighting] = useState<LightingMode>('ambient');
   const [weather, setWeather] = useState<{ temp: number; condition: string; next_event: { label: string } } | null>(null);
+  const [showResult, setShowResult] = useState(false);
   const [sentRequests, setSentRequests] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -471,12 +473,25 @@ export default function ComfortTab() {
       {/* Emama Zinashe Floating AI Assistant */}
       <EmamaAssistant
         page="comfort"
-        onRecommend={() => {
-          setLighting('ambient');
-          setTemperature(24);
-          toast({ title: 'Room Adjusted', description: 'Warm and cozy settings applied!' });
-        }}
+        onRecommend={() => setShowResult(true)}}
       />
+    </div>
+  );
+
+
+      {/* Emama Result Display */}
+      {showResult && (
+        <EmamaResultDisplay
+          title="Perfect Room Settings"
+          message="I have adjusted everything for your comfort, my dear!"
+          items={[
+            { icon: '🌡️', label: 'Temperature Set to 24°C', description: 'Warm and cozy for relaxation' },
+            { icon: '💡', label: 'Ambient Lighting', description: 'Soft, warm tones for a peaceful mood' },
+            { icon: '🛏️', label: 'Extra Blankets Ready', description: 'Placed in your room for your comfort' },
+          ]}
+          onClose={() => setShowResult(false)}
+        />
+      )}
     </div>
   );
 }

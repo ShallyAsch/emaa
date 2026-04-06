@@ -1,5 +1,6 @@
 'use client';
 import EmamaAssistant from '@/src/components/shared/EmamaAssistant';
+import EmamaResultDisplay from '@/src/components/shared/EmamaResultDisplay';
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
@@ -282,6 +283,7 @@ export default function MemoryBoxTab() {
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<EventAttended | null>(null);
+  const [showResult, setShowResult] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const personAvatarInputRef = useRef<HTMLInputElement>(null);
 
@@ -1223,12 +1225,25 @@ export default function MemoryBoxTab() {
       {/* Emama Zinashe Floating AI Assistant */}
       <EmamaAssistant
         page="memory-box"
-        onRecommend={() => {
-          // Scroll to AI story section
-          const el = document.querySelector('[data-ai-story]');
-          el?.scrollIntoView({ behavior: 'smooth' });
-        }}
+        onRecommend={() => setShowResult(true)}}
       />
+    </div>
+  );
+
+
+      {/* Emama Result Display */}
+      {showResult && (
+        <EmamaResultDisplay
+          title="Your Special Moments Story"
+          message="Every moment you spend here becomes part of our family story!"
+          items={[
+            { icon: '☕', label: 'First Coffee Ceremony', description: 'The day you learned to pour buna like a local' },
+            { icon: '🎲', label: 'Gebeta Victory', description: 'When you finally beat the champion player' },
+            { icon: '🌅', label: 'Sunset Friendship', description: 'The evening you met friends from around the world' },
+          ]}
+          onClose={() => setShowResult(false)}
+        />
+      )}
     </div>
   );
 }

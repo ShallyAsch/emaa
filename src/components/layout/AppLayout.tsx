@@ -102,7 +102,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
             </div>
             <div className="hidden sm:flex flex-col">
-              <span className="font-serif text-sm font-semibold text-primary leading-none">My Home</span>
+              <span className="font-serif text-sm font-semibold text-primary leading-none">
+                My Home
+              </span>
               <span className="text-xs text-muted-foreground">እንደ ቤቴ</span>
             </div>
           </Link>
