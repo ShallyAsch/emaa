@@ -21,13 +21,10 @@ const pageMessages: Record<string, string> = {
 
 export default function EmamaAssistant({ page, onRecommend }: EmamaAssistantProps) {
   const [showChat, setShowChat] = useState(true);
-  const [dismissed, setDismissed] = useState(false);
   const [showing, setShowing] = useState(false);
 
   useEffect(() => {
-    const dismissed = typeof window !== 'undefined' && localStorage.getItem(`emama-dismissed-${page}`);
-    if (dismissed) setDismissed(true);
-    else setTimeout(() => setShowing(true), 2000);
+    setTimeout(() => setShowing(true), 2000);
   }, [page]);
 
   const handleRecommend = () => {
@@ -35,13 +32,11 @@ export default function EmamaAssistant({ page, onRecommend }: EmamaAssistantProp
     onRecommend?.();
   };
 
-  const handleDismiss = () => {
-    setDismissed(true);
+  const handleLater = () => {
     setShowChat(false);
-    if (typeof window !== 'undefined') localStorage.setItem(`emama-dismissed-${page}`, 'true');
   };
 
-  if (dismissed || !showing) return null;
+  if (!showing) return null;
 
   return (
     <div className="fixed bottom-6 left-6 md:left-28 z-40">
@@ -58,12 +53,12 @@ export default function EmamaAssistant({ page, onRecommend }: EmamaAssistantProp
             {onRecommend && (
               <button onClick={handleRecommend} className="flex-1 px-4 py-2 bg-accent hover:bg-accent/90 text-primary font-medium rounded-lg text-sm transition-all active:scale-[0.97]">Yes please</button>
             )}
-            <button onClick={handleDismiss} className="px-4 py-2 bg-muted hover:bg-muted/80 text-foreground font-medium rounded-lg text-sm transition-all active:scale-[0.97]">Later</button>
+            <button onClick={handleLater} className="px-4 py-2 bg-muted hover:bg-muted/80 text-foreground font-medium rounded-lg text-sm transition-all active:scale-[0.97]">Later</button>
           </div>
         </div>
       )}
       <button
-        onClick={() => { setShowChat(true); setDismissed(false); }}
+        onClick={() => setShowChat(true)}
         className="w-14 h-14 bg-accent hover:bg-accent/90 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-105 active:scale-[0.97]"
       >
         <span className="text-2xl">👵🏾</span>
