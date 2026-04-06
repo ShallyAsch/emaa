@@ -803,7 +803,12 @@ export default function LittleEthiopiaTab() {
         </div>
       )}
       {/* Emama Zinashe Floating AI Assistant */}
-      <EmamaAssistant page="little-ethiopia" />
+      <EmamaAssistant
+        page="little-ethiopia"
+        onRecommend={() => {
+          window.scrollTo({ top: 400, behavior: 'smooth' });
+        }}
+      />
     </div>
   );
 }

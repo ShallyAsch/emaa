@@ -513,7 +513,32 @@ export default function MyScheduleTab() {
       })()}
 
       {/* Emama Zinashe Floating AI Assistant */}
-      <EmamaAssistant page="schedule" />
+      <EmamaAssistant
+        page="schedule"
+        onRecommend={async () => {
+          try {
+            const res = await fetch('/api/ai-chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ type: 'discovery', message: 'Suggest 2 activities for a resort schedule' }),
+            });
+            const data = await res.json();
+            const newActivity = {
+              id: `ai-${Date.now()}`,
+              time: '3:00 PM',
+              title: data.activity?.name || 'Cultural Experience',
+              location: 'Resort Venue',
+              description: data.reasoning || 'Curated by Emama',
+              whatToWear: ['Comfortable clothing'],
+              preparation: ['Arrive 10 minutes early'],
+              image: '/culture-hero.jpg',
+              completed: false,
+              fromBooking: false,
+            };
+            setAllActivities(prev => [...prev, newActivity]);
+          } catch {}
+        }}
+      />
     </div>
   );
 }

@@ -84,7 +84,12 @@ export default function ExploreTab() {
         </div>
       </div>
       {/* Emama Zinashe Floating AI Assistant */}
-      <EmamaAssistant page="explore" />
+      <EmamaAssistant
+        page="explore"
+        onRecommend={() => {
+          window.scrollTo({ top: 500, behavior: 'smooth' });
+        }}
+      />
     </div>
   );
 }

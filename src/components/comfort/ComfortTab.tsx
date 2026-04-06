@@ -469,7 +469,14 @@ export default function ComfortTab() {
 
       </div>
       {/* Emama Zinashe Floating AI Assistant */}
-      <EmamaAssistant page="comfort" />
+      <EmamaAssistant
+        page="comfort"
+        onRecommend={() => {
+          setLighting('ambient');
+          setTemperature(24);
+          toast({ title: 'Room Adjusted', description: 'Warm and cozy settings applied!' });
+        }}
+      />
     </div>
   );
 }

@@ -740,7 +740,10 @@ export default function EventsTab() {
         </div>
       )}
       {/* Emama Zinashe Floating AI Assistant */}
-      <EmamaAssistant page="events" />
+      <EmamaAssistant
+        page="events"
+        onRecommend={() => setShowEmamaSuggestions(true)}
+      />
     </div>
   );
 }

@@ -1221,7 +1221,14 @@ export default function MemoryBoxTab() {
         </div>
       )}
       {/* Emama Zinashe Floating AI Assistant */}
-      <EmamaAssistant page="memory-box" />
+      <EmamaAssistant
+        page="memory-box"
+        onRecommend={() => {
+          // Scroll to AI story section
+          const el = document.querySelector('[data-ai-story]');
+          el?.scrollIntoView({ behavior: 'smooth' });
+        }}
+      />
     </div>
   );
 }

@@ -879,7 +879,10 @@ export default function CommunityTab() {
         </div>
       )}
       {/* Emama Zinashe Floating AI Assistant */}
-      <EmamaAssistant page="community" />
+      <EmamaAssistant
+        page="community"
+        onRecommend={() => setShowIntroducePopup(true)}
+      />
     </div>
   );
 }
