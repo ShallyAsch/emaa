@@ -22,10 +22,10 @@ export { default as TodayTab } from './today/TodayTab';
 export { default as ActivityCard } from './today/ActivityCard';
 export { default as EventsTab } from './events/EventsTab';
 export { default as MessagesTab } from './messages/MessagesTab';
-export { default as MemoriesTab } from './memories/MemoriesTab';
-export { default as FamilyProfileEditor } from './memories/FamilyProfileEditor';
 export { default as LittleEthiopiaTab } from './little-ethiopia/LittleEthiopiaTab';
 export { default as MyScheduleTab } from './schedule/MyScheduleTab';
+export { default as GebetaTab } from './gebeta/GebetaTab';
 
 // Shared Components
 export { default as ExperienceModal } from './shared/ExperienceModal';
+export { default as EmamaAssistant } from './shared/EmamaAssistant';

@@ -1,4 +1,5 @@
 'use client';
+import EmamaAssistant from '@/src/components/shared/EmamaAssistant';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, AlertCircle, Sun, Moon, Sunset, Lightbulb, User } from 'lucide-react';
@@ -79,7 +80,7 @@ export default function ComfortTab() {
           try {
             const result = await analyzeMoodAndIntent(
               transcript,
-              { roomTemperature: temperature, lightingPreference: lighting as 'day' | 'night' | 'ambient', language: 'en', dietaryRestrictions: [] },
+              { roomTemperature: temperature, lightingPreference: lighting as 'day' | 'night' | 'ambient', language: 'en', dietaryRestrictions: [], coffeeType: 'medium', favoriteSeating: '' },
               {
                 setTemperature,
                 setLighting: (l: string) => setLighting(l as LightingMode),

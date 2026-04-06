@@ -1,4 +1,5 @@
 'use client';
+import EmamaAssistant from '@/src/components/shared/EmamaAssistant';
 
 import { useState, useRef } from 'react';
 import Image from 'next/image';

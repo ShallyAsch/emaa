@@ -1,4 +1,5 @@
 'use client';
+import EmamaAssistant from '@/src/components/shared/EmamaAssistant';
 
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
