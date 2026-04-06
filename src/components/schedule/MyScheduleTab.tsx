@@ -517,11 +517,8 @@ export default function MyScheduleTab() {
       {/* Emama Zinashe Floating AI Assistant */}
       <EmamaAssistant
         page="schedule"
-        onRecommend={() => setShowResult(true)}}
+        onRecommend={() => setShowResult(true)}
       />
-    </div>
-  );
-
 
       {/* Emama Result Display */}
       {showResult && (

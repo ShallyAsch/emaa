@@ -652,11 +652,8 @@ export default function GebetaTab() {
       {/* Emama Zinashe Floating AI Assistant */}
       <EmamaAssistant
         page="gebeta"
-        onRecommend={() => setShowResult(true)}}
+        onRecommend={() => setShowResult(true)}
       />
-    </div>
-  );
-
 
       {/* Emama Result Display */}
       {showResult && (

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
 import { Sparkles } from 'lucide-react';
@@ -90,9 +90,6 @@ export default function ExploreTab() {
         page="explore"
         onRecommend={() => setShowResult(true)}
       />
-    </div>
-  );
-
 
       {/* Emama Result Display */}
       {showResult && (

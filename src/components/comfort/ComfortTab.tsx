@@ -473,11 +473,8 @@ export default function ComfortTab() {
       {/* Emama Zinashe Floating AI Assistant */}
       <EmamaAssistant
         page="comfort"
-        onRecommend={() => setShowResult(true)}}
+        onRecommend={() => setShowResult(true)}
       />
-    </div>
-  );
-
 
       {/* Emama Result Display */}
       {showResult && (

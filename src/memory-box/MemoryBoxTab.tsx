@@ -1225,11 +1225,8 @@ export default function MemoryBoxTab() {
       {/* Emama Zinashe Floating AI Assistant */}
       <EmamaAssistant
         page="memory-box"
-        onRecommend={() => setShowResult(true)}}
+        onRecommend={() => setShowResult(true)}
       />
-    </div>
-  );
-
 
       {/* Emama Result Display */}
       {showResult && (
