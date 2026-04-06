@@ -323,7 +323,7 @@ export default function EventsTab() {
         {/* Section 1: Emama's AI Suggestions */}
         <section className="space-y-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center text-2xl">👵</div>
+            <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center text-2xl">👵🏾</div>
             <div>
               <h2 className="font-serif text-2xl md:text-3xl font-bold text-primary">Emama&apos;s Suggestions for You</h2>
               <p className="text-muted-foreground text-sm flex items-center gap-2"><Sparkles className="w-4 h-4 text-accent" /> AI-personalized event ideas based on your profile</p>
@@ -345,7 +345,7 @@ export default function EventsTab() {
                   </div>
                 </div>
                 <div className="p-4">
-                  <div className="flex items-start gap-2"><span className="text-lg flex-shrink-0">👵</span><p className="text-sm text-foreground/80 italic">&quot;{sug.aiInsight}&quot;</p></div>
+                  <div className="flex items-start gap-2"><span className="text-lg flex-shrink-0">👵🏾</span><p className="text-sm text-foreground/80 italic">&quot;{sug.aiInsight}&quot;</p></div>
                   <button className="w-full mt-3 py-2 bg-accent/20 hover:bg-accent/30 text-accent font-medium rounded-lg text-sm transition-all flex items-center justify-center gap-2 active:scale-[0.97]"><Gift className="w-4 h-4" /> Plan This Event</button>
                 </div>
               </div>
@@ -578,7 +578,7 @@ export default function EventsTab() {
             <div className="p-6 md:p-8 space-y-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center text-xl">👵</div>
+                  <div className="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center text-xl">👵🏾</div>
                   <div>
                     <h2 className="font-serif text-xl font-bold text-primary">Build Your Own Event</h2>
                     <p className="text-sm text-muted-foreground">Emama will analyze and suggest the perfect setup</p>
@@ -629,7 +629,7 @@ export default function EventsTab() {
                     <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto"><Check className="w-8 h-8 text-green-600" /></div>
                     <h3 className="text-xl font-bold text-primary">Request Submitted!</h3>
                     <div className="flex items-start gap-3 text-left glass rounded-xl p-4">
-                      <span className="text-2xl">👵</span>
+                      <span className="text-2xl">👵🏾</span>
                       <p className="text-sm text-foreground/80">&quot;Wonderful, my dear! Your request for &apos;{eventForm.title}&apos; has been submitted. Our team will review it and get back to you soon.&quot;</p>
                     </div>
                   </div>
@@ -637,7 +637,7 @@ export default function EventsTab() {
                 {aiRecommendation && (
                   <div className="space-y-4">
                     <div className="glass rounded-xl p-4 bg-accent/10 border border-accent/30">
-                      <div className="flex items-start gap-3"><span className="text-2xl">👵</span><div><p className="text-sm font-semibold text-primary mb-1">Emama&apos;s Recommendation</p><p className="text-sm text-foreground/80">{aiRecommendation.aiMessage}</p></div></div>
+                      <div className="flex items-start gap-3"><span className="text-2xl">👵🏾</span><div><p className="text-sm font-semibold text-primary mb-1">Emama&apos;s Recommendation</p><p className="text-sm text-foreground/80">{aiRecommendation.aiMessage}</p></div></div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       {aiRecommendation.suggestedPackage && <div className="glass rounded-xl p-4"><p className="text-xs text-muted-foreground mb-1">Suggested Package</p><p className="font-semibold text-foreground flex items-center gap-2"><Cake className="w-4 h-4 text-accent" />{aiRecommendation.suggestedPackage.title}</p></div>}
@@ -657,7 +657,7 @@ export default function EventsTab() {
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto"><Check className="w-8 h-8 text-green-600" /></div>
                   <h3 className="font-serif text-xl font-bold text-primary">Request Submitted!</h3>
                   <p className="text-muted-foreground text-sm max-w-sm mx-auto">Thank you! Our team will review your event details and contact you within 24 hours.</p>
-                  <div className="glass rounded-xl p-4 bg-accent/10 text-left"><div className="flex items-start gap-3"><span className="text-xl">👵</span><p className="text-sm text-foreground/80">&quot;I&apos;ve sent your request to our wonderful team. They&apos;ll take good care of you.&quot;</p></div></div>
+                  <div className="glass rounded-xl p-4 bg-accent/10 text-left"><div className="flex items-start gap-3"><span className="text-xl">👵🏾</span><p className="text-sm text-foreground/80">&quot;I&apos;ve sent your request to our wonderful team. They&apos;ll take good care of you.&quot;</p></div></div>
                   <button onClick={resetBuildModal} className="px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-all active:scale-[0.97]">Done</button>
                 </div>
               )}
@@ -672,7 +672,7 @@ export default function EventsTab() {
           {showEmamaChat && (
             <div className="absolute bottom-16 left-0 w-80 bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-5 space-y-4 border border-border animate-in slide-in-from-bottom-2 fade-in">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center text-xl flex-shrink-0">👵</div>
+                <div className="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center text-xl flex-shrink-0">👵🏾</div>
                 <div>
                   <p className="text-sm font-semibold text-primary">Emama Zinashe</p>
                   <p className="text-sm text-foreground/80 mt-1">Would you like help planning your special moment? I can suggest the perfect celebration or meeting space!</p>
@@ -685,7 +685,7 @@ export default function EventsTab() {
             </div>
           )}
           <button onClick={() => setShowEmamaChat(!showEmamaChat)} className="w-14 h-14 bg-accent hover:bg-accent/90 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-105 active:scale-[0.97]">
-            <span className="text-2xl">👵</span>
+            <span className="text-2xl">👵🏾</span>
           </button>
         </div>
       )}
@@ -697,7 +697,7 @@ export default function EventsTab() {
             <div className="p-6 md:p-8 space-y-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center text-2xl">👵</div>
+                  <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center text-2xl">👵🏾</div>
                   <div>
                     <h2 className="font-serif text-xl font-bold text-primary">Emama&apos;s Suggestions For You</h2>
                     <p className="text-sm text-muted-foreground">Personalized event ideas based on your profile</p>
@@ -723,7 +723,7 @@ export default function EventsTab() {
                         </div>
                         <p className="text-sm text-muted-foreground">{suggestion.reason}</p>
                         <div className="glass rounded-lg px-3 py-2 bg-accent/5 border border-accent/20">
-                          <p className="text-xs text-foreground/70 flex items-start gap-2"><span className="text-lg">👵</span><span>{suggestion.aiInsight}</span></p>
+                          <p className="text-xs text-foreground/70 flex items-start gap-2"><span className="text-lg">👵🏾</span><span>{suggestion.aiInsight}</span></p>
                         </div>
                       </div>
                       <ChevronRight className="w-5 h-5 text-muted-foreground self-center flex-shrink-0" />

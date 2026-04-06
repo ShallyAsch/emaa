@@ -49,7 +49,7 @@ export default function MessagesTab() {
         content:
           'Thank you for reaching out! We will take care of that right away.',
         timestamp: new Date(),
-        avatar: '👵',
+        avatar: '👵🏾',
       };
       setMessages((prev) => [...prev, hostMessage]);
     }, 1000);
@@ -64,7 +64,7 @@ export default function MessagesTab() {
             Chat with your host
           </h1>
           <p className="text-sm text-muted-foreground">
-            👵 Mama Almaz is here to help
+            👵🏾 Mama Almaz is here to help
           </p>
         </div>
 
@@ -79,7 +79,7 @@ export default function MessagesTab() {
             >
               {/* Avatar */}
               <div className="text-2xl flex-shrink-0">
-                {msg.avatar || (msg.sender === 'host' ? '👵' : '👤')}
+                {msg.avatar || (msg.sender === 'host' ? '👵🏾' : '👤')}
               </div>
 
               {/* Message Bubble */}

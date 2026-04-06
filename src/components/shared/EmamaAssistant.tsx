@@ -48,7 +48,7 @@ export default function EmamaAssistant({ page, onRecommend }: EmamaAssistantProp
       {showChat && (
         <div className="absolute bottom-16 left-0 w-80 bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-5 space-y-4 border border-border animate-in slide-in-from-bottom-2 fade-in">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center text-xl flex-shrink-0">👵</div>
+            <div className="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center text-xl flex-shrink-0">👵🏾</div>
             <div>
               <p className="text-sm font-semibold text-primary">Emama Zinashe</p>
               <p className="text-sm text-foreground/80 mt-1">{pageMessages[page] || 'How can I make your stay more wonderful today?'}</p>
@@ -66,7 +66,7 @@ export default function EmamaAssistant({ page, onRecommend }: EmamaAssistantProp
         onClick={() => { setShowChat(true); setDismissed(false); }}
         className="w-14 h-14 bg-accent hover:bg-accent/90 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-105 active:scale-[0.97]"
       >
-        <span className="text-2xl">👵</span>
+        <span className="text-2xl">👵🏾</span>
       </button>
     </div>
   );

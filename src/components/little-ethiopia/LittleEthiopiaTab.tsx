@@ -610,7 +610,7 @@ export default function LittleEthiopiaTab() {
             <div className="absolute bottom-16 left-0 w-80 glass rounded-2xl shadow-warm p-5 space-y-4 animate-in slide-in-from-bottom-2 fade-in">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center text-xl flex-shrink-0">
-                  👵
+                  👵🏾
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-primary">Emama Zinashe</p>
@@ -639,7 +639,7 @@ export default function LittleEthiopiaTab() {
             onClick={() => setShowEmamaChat(!showEmamaChat)}
             className="w-14 h-14 bg-accent hover:bg-accent/90 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-105"
           >
-            <span className="text-2xl">👵</span>
+            <span className="text-2xl">👵🏾</span>
           </button>
         </div>
       )}
@@ -672,7 +672,7 @@ export default function LittleEthiopiaTab() {
             <div className="p-6 space-y-4">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center text-xl flex-shrink-0">
-                  👵
+                  👵🏾
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-primary">Emama Zinashe recommends:</p>

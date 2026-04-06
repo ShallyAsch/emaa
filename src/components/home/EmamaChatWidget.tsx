@@ -102,7 +102,7 @@ export default function EmamaChatWidget() {
           <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-xl shadow-inner">
-                👵
+                👵🏾
               </div>
               <div>
                 <h3 className="font-semibold leading-none mb-1">Emama Zinashe</h3>
@@ -120,7 +120,7 @@ export default function EmamaChatWidget() {
               >
                 {msg.role === 'assistant' && (
                   <div className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center text-xs mr-2 mt-auto mb-1 shrink-0">
-                    👵
+                    👵🏾
                   </div>
                 )}
                 <div
@@ -139,7 +139,7 @@ export default function EmamaChatWidget() {
             {isTyping && (
               <div className="flex justify-start items-end">
                 <div className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center text-[10px] mr-2 mb-1">
-                  👵
+                  👵🏾
                 </div>
                 <div className="bg-white border border-border rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-1 min-h-[44px]">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-typingBounce" />

@@ -16,7 +16,7 @@ export default function EmamaResultDisplay({ title, items, message, onClose }: E
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 fade-in">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center text-xl">👵</div>
+            <div className="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center text-xl">👵🏾</div>
             <div>
               <p className="text-sm font-semibold text-primary">Emama recommends</p>
               <p className="text-xs text-muted-foreground">{title}</p>

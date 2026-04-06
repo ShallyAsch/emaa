@@ -127,17 +127,21 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 appearance={{ elements: { avatarBox: 'w-9 h-9' } }}
               />
 
-              <SignInButton mode="modal">
-                <button className="flex items-center justify-center w-9 h-9 rounded-full border border-border bg-white hover:bg-accent/10 transition-smooth shadow-sm" aria-label="Sign in">
-                  <LogIn className="w-4 h-4 text-primary" />
-                </button>
-              </SignInButton>
+              {!isSignedIn && (
+                <>
+                  <SignInButton mode="modal">
+                    <button className="flex items-center justify-center w-9 h-9 rounded-full border border-border bg-white hover:bg-accent/10 transition-smooth shadow-sm" aria-label="Sign in">
+                      <LogIn className="w-4 h-4 text-primary" />
+                    </button>
+                  </SignInButton>
 
-              <SignUpButton mode="modal">
-                <button className="flex items-center justify-center w-9 h-9 rounded-full border border-border bg-white hover:bg-accent/10 transition-smooth shadow-sm" aria-label="Sign up">
-                  <UserPlus className="w-4 h-4 text-primary" />
-                </button>
-              </SignUpButton>
+                  <SignUpButton mode="modal">
+                    <button className="flex items-center justify-center w-9 h-9 rounded-full border border-border bg-white hover:bg-accent/10 transition-smooth shadow-sm" aria-label="Sign up">
+                      <UserPlus className="w-4 h-4 text-primary" />
+                    </button>
+                  </SignUpButton>
+                </>
+              )}
             </div>
 
             <LanguageSwitcher />
@@ -203,20 +207,22 @@ export default function AppLayout({ children }: AppLayoutProps) {
               ))}
 
               {/* Mobile Auth Links */}
-              <div className="pt-4 mt-4 border-t border-white/10 space-y-2">
-                <SignInButton mode="modal">
-                  <button className="flex items-center gap-4 w-full px-4 py-4 rounded-xl text-white hover:bg-white/10 transition-smooth">
-                    <LogIn className="w-6 h-6" />
-                    <span>Sign In</span>
-                  </button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                  <button className="flex items-center gap-4 w-full px-4 py-4 rounded-xl text-white hover:bg-white/10 transition-smooth">
-                    <UserPlus className="w-6 h-6" />
-                    <span>Sign Up</span>
-                  </button>
-                </SignUpButton>
-              </div>
+              {!isSignedIn && (
+                <div className="pt-4 mt-4 border-t border-white/10 space-y-2">
+                  <SignInButton mode="modal">
+                    <button className="flex items-center gap-4 w-full px-4 py-4 rounded-xl text-white hover:bg-white/10 transition-smooth">
+                      <LogIn className="w-6 h-6" />
+                      <span>Sign In</span>
+                    </button>
+                  </SignInButton>
+                  <SignUpButton mode="modal">
+                    <button className="flex items-center gap-4 w-full px-4 py-4 rounded-xl text-white hover:bg-white/10 transition-smooth">
+                      <UserPlus className="w-6 h-6" />
+                      <span>Sign Up</span>
+                    </button>
+                  </SignUpButton>
+                </div>
+              )}
             </div>
           </div>
         </>

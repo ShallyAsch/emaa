@@ -279,7 +279,7 @@ export default function ComfortTab() {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-xl shadow-inner">
-                    👵
+                    👵🏾
                   </div>
                   <div>
                     <span className="text-xs font-bold text-accent uppercase tracking-widest flex items-center gap-1">
