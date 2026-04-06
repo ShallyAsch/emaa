@@ -101,11 +101,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary overflow-hidden group-hover:scale-105 transition-smooth">
               <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
             </div>
-            <div className="hidden sm:flex flex-col">
+            <div className="flex items-center gap-1.5">
               <span className="font-serif text-sm font-semibold text-primary leading-none">
                 My Home
               </span>
-              <span className="text-xs text-muted-foreground">እንደ ቤቴ</span>
+              <span className="text-sm text-muted-foreground leading-none">|</span>
+              <span className="font-serif text-sm font-semibold text-primary leading-none">
+                እንደ ቤቴ
+              </span>
             </div>
           </Link>
 
